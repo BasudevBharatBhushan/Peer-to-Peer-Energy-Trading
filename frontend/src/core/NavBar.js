@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import React, { Fragment, useState } from "react";
-import { Button, Menu } from "semantic-ui-react";
+import { Button, Menu, Segment, Header } from "semantic-ui-react";
 import { signout, isAuthenticated } from "../auth/helper";
 
-const NavBar = () => {
+const NavBar = ({ title = "TITLE GOES HERE", TitleColour = "black" }) => {
   const navigate = useNavigate();
+  const [navState, setNavState] = useState();
 
   return (
     <Menu className="Navbar" pointing secondary>
@@ -32,13 +33,30 @@ const NavBar = () => {
           }}
         />
       )}
-      <Menu.Item
-        name="About"
-        onClick={() => {
-          navigate("/About");
-        }}
-      />
+
+      <Menu.Item>
+        <Segment
+          inverted
+          style={{
+            padding: "7px",
+            position: "fixed",
+            marginBottom: "15px",
+            background: `${TitleColour}`,
+          }}
+        >
+          <b>{title}</b>
+        </Segment>
+      </Menu.Item>
+
+      {/* <Segment size="mini">Title</Segment> */}
+
       <Menu.Menu position="right">
+        <Menu.Item
+          name="About"
+          onClick={() => {
+            navigate("/About");
+          }}
+        />
         {!isAuthenticated() && (
           <Fragment>
             <Menu.Item

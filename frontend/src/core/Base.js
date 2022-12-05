@@ -3,14 +3,10 @@ import React, { Children } from "react";
 import NavBar from "./NavBar";
 import { Button, Divider, Grid, Image, Segment, Icon } from "semantic-ui-react";
 
-const Base = ({ title = "My Title", description = "", children }) => {
+const Base = ({ title = "My Title", TitleColour = "black", children }) => {
   return (
     <div>
-      <NavBar />
-      <Segment inverted>
-        <h3 style={{ textAlign: "center" }}>{title}</h3>
-      </Segment>
-      {description}
+      <NavBar title={title} TitleColour={TitleColour} />
       {children}
       <Segment
         style={{

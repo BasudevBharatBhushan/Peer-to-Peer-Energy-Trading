@@ -85,7 +85,7 @@ const Signin = () => {
           </Form.Field>
 
           <Button onClick={onSubmit} type="submit">
-            Submit
+            Login
           </Button>
         </Form>
       </div>
@@ -124,7 +124,7 @@ const Signin = () => {
 
   return (
     <div>
-      <Base title={"Login"}>
+      <Base title={"Login to view your Dashboard"}>
         {loadingMessage()}
         {errorMessage()}
         {signInForm()}

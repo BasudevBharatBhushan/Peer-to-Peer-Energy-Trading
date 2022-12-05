@@ -1,6 +1,7 @@
 const Card = require("../models/card");
 
 exports.getCardById = (req, res, next, id) => {
+  console.log(id);
   Card.findById(id).exec((err, card) => {
     if (err) {
       return res.status(400).json({
@@ -8,14 +9,14 @@ exports.getCardById = (req, res, next, id) => {
       });
     }
     req.card = card;
+    console.log(req.card);
     next();
   });
 };
 
 exports.createCard = (req, res) => {
-  req.body.card.prosumer = req.profile;
-
-  const card = new Card(req.body.card);
+  console.log("Reached card controller");
+  const card = new Card(req.body.values);
   card.save((err, card) => {
     if (err) {
       return res.status(400).json({
@@ -37,4 +38,19 @@ exports.getAllCard = (req, res) => {
       }
       res.json(card);
     });
+};
+
+exports.removeCard = (req, res) => {
+  const card = req.card;
+
+  card.remove((err, deletedCard) => {
+    if (err) {
+      return res.status(400).json({
+        error: "Failed to delete the card",
+      });
+    }
+    res.json({
+      message: `$card successfully deleted`,
+    });
+  });
 };

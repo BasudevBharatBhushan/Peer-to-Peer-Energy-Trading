@@ -89,7 +89,7 @@ const Signup = () => {
           </Form.Field>
 
           <Button onClick={onSubmit} type="submit">
-            Submit
+            Register
           </Button>
         </Form>
       </div>
@@ -133,7 +133,7 @@ const Signup = () => {
 
   return (
     <div>
-      <Base title={"SIGNUP"}>
+      <Base title={"Register into the Network"}>
         {successMessage()}
         {errorMessage()}
         {signUpForm()}

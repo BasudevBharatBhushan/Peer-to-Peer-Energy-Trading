@@ -1,7 +1,8 @@
-const User = require("../models/prosumer");
+const Prosumer = require("../models/prosumer");
 
 /*------------------Middleware--------------------- */
 exports.getProsumerById = (req, res, next, id) => {
+  console.log("Hello There, I am triggering too...");
   Prosumer.findById(id).exec((err, prosumer) => {
     if (err || !prosumer) {
       return res.status(400).json({

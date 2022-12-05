@@ -99,6 +99,11 @@ exports.isSignedIn = expressJwt({
 
 exports.isAuthenticated = (req, res, next) => {
   //req.profile is being check by the frontend & req.auth is being checked by expressJWT
+  console.log("Reached auth controller");
+  console.log(req.profile);
+  // let checker =
+  // req.body && req.auth && req.body.values.listProsumer._id == req.auth._id;
+
   let checker = req.profile && req.auth && req.profile._id == req.auth._id;
   if (!checker) {
     return res.status(403).json({

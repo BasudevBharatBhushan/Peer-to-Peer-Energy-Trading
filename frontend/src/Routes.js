@@ -9,6 +9,8 @@ import Signin from "./prosumer/Signin";
 import Signup from "./prosumer/Signup";
 import AddProsumer from "./admin/AddProsumer";
 import ExecuteTransaction from "./admin/ExecuteTransaction";
+import About from "./core/About";
+import Card from "./core/Card";
 
 /*---Admin Routes & Private Routes----*/
 import AdminRoutes from "./auth/helper/AdminRoutes";
@@ -21,6 +23,9 @@ const Routes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/card" element={<Card />} />
+
         <Route exact path="/prosumer/dashboard" element={<PrivateRoutes />}>
           <Route
             exact
