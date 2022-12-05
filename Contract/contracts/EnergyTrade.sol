@@ -261,6 +261,17 @@ contract EnergyTrade is Energy_Token, PriceConverter {
         }
     }
 
+    //--> HIDDEN FUNCTION (Only created for easy demonstration of Project), Not reccomended in Production
+    function removeProsumer() public onlyOwner {
+        address lastProsumer = prosumerAddress[ApprovedProsumers.length];
+        delete prosumerAddress[ApprovedProsumers.length];
+
+        //Remove last element from ApprovedProsumers Array
+        ApprovedProsumers.pop();
+
+        delete prosumerID[lastProsumer];
+    }
+
     //-->^^^^^^^^^^^^^^^^^^^^^^^^ Process Trade ^^^^^^^^^^^^^^^^^^^^
     function processTrade() public onlyOwner {
         //Designed to process multiple Trade with a single click
@@ -327,9 +338,13 @@ contract EnergyTrade is Energy_Token, PriceConverter {
     uint256 EnergyUnitPrice_matic;
 
     function setUnitPrice(uint256 price) internal onlyProsumer returns (uint256) {
+        /* New Approach - Take Price input as 1e10 */
+
         EnergyUnitPrice_usd = price;
         uint256 latestMaticPrice = uint(getLatestPrice());
-        EnergyUnitPrice_matic = (price / latestMaticPrice) * 1e8;
+        // EnergyUnitPrice_matic = (price / latestMaticPrice) * 1e8;   (when we receive input as 1e18)
+        EnergyUnitPrice_matic = (price / latestMaticPrice) * 1e16;
+        /*------- 1e10/1e8 * 1e16 = 1e18 -----------------------*/
         return EnergyUnitPrice_matic;
     }
 

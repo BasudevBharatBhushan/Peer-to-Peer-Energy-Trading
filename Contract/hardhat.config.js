@@ -16,13 +16,26 @@ module.exports = {
             accounts: [PRIVATE_KEY],
         },
     },
+
     solidity: {
         compilers: [
             {
                 version: "0.8.8",
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 1000,
+                    },
+                },
             },
             {
                 version: "0.6.6",
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 1000,
+                    },
+                },
             },
         ],
     },
