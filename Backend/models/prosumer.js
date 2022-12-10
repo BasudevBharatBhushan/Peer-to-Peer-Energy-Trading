@@ -24,6 +24,10 @@ var prosumerSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  aadharId: {
+    type: Number,
+    default: 0,
+  },
   maticBalance: {
     type: Number,
     default: 0,

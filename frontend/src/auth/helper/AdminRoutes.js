@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { isAuthenticated } from "./index";
 
 const AdminRoutes = ({ component: Component, ...rest }) => {
-  return isAuthenticated() && isAuthenticated().prosumer.role === 1 ? (
+  return isAuthenticated() && isAuthenticated().prosumer.role > 0 ? (
     <Outlet />
   ) : (
     <Navigate to="/signin" />

@@ -7,6 +7,7 @@ const CardSchema = new mongoose.Schema({
   listProsumer: {
     type: ObjectId,
     ref: "Prosumer",
+    unique: true,
   },
   unitPriceUSD: {
     type: Number,

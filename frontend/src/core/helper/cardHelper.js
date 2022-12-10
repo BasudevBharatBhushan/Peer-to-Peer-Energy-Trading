@@ -18,14 +18,3 @@ export const createCard = (prosumer, token, card) => {
     })
     .catch((err) => console.log(err));
 };
-
-export const getAllCards = () => {
-  console.log("getAllCard API Triggered");
-  return fetch(`${API}/card/all`, {
-    method: "GET",
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      return data;
-    });
-};

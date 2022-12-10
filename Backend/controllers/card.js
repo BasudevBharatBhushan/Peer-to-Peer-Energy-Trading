@@ -16,7 +16,8 @@ exports.getCardById = (req, res, next, id) => {
 
 exports.createCard = (req, res) => {
   console.log("Reached card controller");
-  const card = new Card(req.body.values);
+  console.log(req.body);
+  const card = new Card(req.body);
   card.save((err, card) => {
     if (err) {
       return res.status(400).json({

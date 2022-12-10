@@ -2,7 +2,7 @@ const Prosumer = require("../models/prosumer");
 
 /*------------------Middleware--------------------- */
 exports.getProsumerById = (req, res, next, id) => {
-  console.log("Hello There, I am triggering too...");
+  console.log("Get Prosumer by ID triggered...");
   Prosumer.findById(id).exec((err, prosumer) => {
     if (err || !prosumer) {
       return res.status(400).json({
@@ -21,6 +21,19 @@ exports.getProsumer = (req, res) => {
   req.profile.salt = undefined;
   req.profile.encry_password = undefined;
   return res.json(req.profile);
+};
+
+exports.getAllProsumer = (req, res) => {
+  Prosumer.find()
+    .populate("user", "_id name")
+    .exec((err, prosumer) => {
+      if (err) {
+        return res.status(400).json({
+          error: "No Card found in DB",
+        });
+      }
+      res.json(prosumer);
+    });
 };
 
 exports.updateProsumer = (req, res) => {

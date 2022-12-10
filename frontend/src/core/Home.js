@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Base from "./Base";
 import { Link } from "react-router-dom";
 import { Button, Segment, Image } from "semantic-ui-react";
