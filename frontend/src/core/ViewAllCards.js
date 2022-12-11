@@ -22,7 +22,6 @@ const ViewAllCards = () => {
     fetch(`${API}/card/all`)
       .then((response) => response.json())
       .then((data) => {
-        // console.log(data);
         setObj(data);
         console.log("OBJECTS", obj[0]);
       });
@@ -32,7 +31,6 @@ const ViewAllCards = () => {
     const x = await getProsumerById(prosumerID).then((data) => {
       return data;
     });
-    // setQueryProsumer(x);
     console.log(x);
     console.log(queryProsumer);
   };
@@ -43,18 +41,15 @@ const ViewAllCards = () => {
         <Transition.Group>
           {obj &&
             obj.map((card) => {
-              {
-                /* getProsumer(card.listProsumer); */
-              }
-
               return (
                 <Grid.Column>
                   <PostCard
-                    Prosumer_id={queryProsumer.publicAddress}
-                    Prosumer_Name="BASUDEV"
-                    stakedEnergy="2"
-                    uintPriceUSD="8"
-                    unitPriceMatic="0.001"
+                    cardID={card._id}
+                    Prosumer_id={card.prosumerID}
+                    Prosumer_Name={card.name}
+                    stakedEnergy={card.stakedEnergy}
+                    uintPriceUSD={card.unitPriceUSD}
+                    unitPriceMatic={card.unitPriceMatic}
                   />
                 </Grid.Column>
               );

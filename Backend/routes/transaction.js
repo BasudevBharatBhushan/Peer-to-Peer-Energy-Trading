@@ -17,13 +17,16 @@ router.param("transactionId", getTransactionById);
 
 //Actual Routes
 
+// //Create
+// router.post(
+//   "/transaction/create/:prosumerId",
+//   isSignedIn,
+//   isAuthenticated,
+//   createTransaction
+// );
+
 //Create
-router.post(
-  "/transaction/create/:prosumerId",
-  isSignedIn,
-  isAuthenticated,
-  createTransaction
-);
+router.post("/transaction/create", createTransaction);
 
 //Read
 

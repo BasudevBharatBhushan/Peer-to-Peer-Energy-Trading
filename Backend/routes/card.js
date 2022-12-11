@@ -9,6 +9,7 @@ const {
   createCard,
   getAllCard,
   removeCard,
+  updateCard,
 } = require("../controllers/card");
 
 //params
@@ -35,12 +36,17 @@ router.get("/card/all", getAllCard);
 
 router.get("/card/:cardId", getCardById);
 
+//Update the Card
+router.put("/card/:cardId", updateCard);
+
 //Delete Card
-router.delete(
-  "/card/:cardId/:prosumerId",
-  isSignedIn,
-  isAuthenticated,
-  removeCard
-);
+// router.delete(
+//   "/card/:cardId/:prosumerId",
+//   isSignedIn,
+//   isAuthenticated,
+//   removeCard
+// );
+
+router.delete("/card/:cardId", removeCard);
 
 module.exports = router;

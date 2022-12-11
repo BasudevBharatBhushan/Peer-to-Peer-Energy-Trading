@@ -51,7 +51,8 @@ contract EnergyTrade is Energy_Token, PriceConverter {
         uint256 _producerID;
         uint256 _consumerID;
         uint256 _consumerEnergyNeed;
-        uint256 _producerUnitPrice; //MATIC
+        uint256 _producerUnitPriceUSD;
+        uint256 _producerUnitPriceMATIC;
         uint256 _producerPaybleAmount;
     }
 
@@ -85,6 +86,20 @@ contract EnergyTrade is Energy_Token, PriceConverter {
     /*-----------------------------------------------------------------------------------------------*/
 
     /********************ESCROW FUNCTIONS**********************************/
+
+    /*-------------SPECIAL FUNCTION-------------------*/
+
+    function transferOwnership(address newOwner)public onlyOwner {
+        for(uint256 i = 0; i< owners.length; i++){
+            if(owners[i]==msg.sender){
+                owners[i]=newOwner;
+                break;
+            }
+        }
+    }
+
+
+
 
     //--> 1. Set Registration Fee
 
@@ -153,7 +168,7 @@ contract EnergyTrade is Energy_Token, PriceConverter {
         } else if (disapproved[_unapprovedProsumerAddress][msg.sender]) {
             return ("Prosumer Disapproved");
         } else {
-            return ("Prosumer Not Approved Yet");
+            return ("Prosumer Not Verified Yet");
         }
     }
 
@@ -332,19 +347,22 @@ contract EnergyTrade is Energy_Token, PriceConverter {
         unApprovedProsumers.push(_prosumer);
     }
 
+    function getAllPendingTxn()public view returns(Txn[] memory){
+        return Transaction;
+    }
+
     /*-------------------Producer--------------------------------------------------------------*/
 
     uint256 EnergyUnitPrice_usd;
     uint256 EnergyUnitPrice_matic;
 
     function setUnitPrice(uint256 price) internal onlyProsumer returns (uint256) {
-        /* New Approach - Take Price input as 1e10 */
+        /* New Approach - Take Price input as 1e16 */
 
         EnergyUnitPrice_usd = price;
         uint256 latestMaticPrice = uint(getLatestPrice());
-        // EnergyUnitPrice_matic = (price / latestMaticPrice) * 1e8;   (when we receive input as 1e18)
-        EnergyUnitPrice_matic = (price / latestMaticPrice) * 1e16;
-        /*------- 1e10/1e8 * 1e16 = 1e18 -----------------------*/
+        EnergyUnitPrice_matic = (price / latestMaticPrice) * 1e10;
+        /*------- 1e16/1e8 * 1e10 = 1e18 -----------------------*/
         return EnergyUnitPrice_matic;
     }
 
@@ -352,6 +370,9 @@ contract EnergyTrade is Energy_Token, PriceConverter {
         uint256 unitEnergyPrice,
         uint256 excessEnergyToken
     ) public onlyProsumer returns (uint256) {
+
+        require(ApprovedProsumers[prosumerID[msg.sender]-1]._stakedEnergyBalance==0, "You have Already Staked Energy");
+
         transfer(escrowAccount, excessEnergyToken);
 
         uint256 ad_placerID = prosumerID[msg.sender];
@@ -398,7 +419,8 @@ contract EnergyTrade is Energy_Token, PriceConverter {
             _producerID: producerID,
             _consumerID: prosumerID[msg.sender],
             _consumerEnergyNeed: energy_need,
-            _producerUnitPrice: ApprovedProsumers[producerID - 1]._energyUnitPriceMatic,
+            _producerUnitPriceUSD:ApprovedProsumers[producerID - 1]._energyUnitPriceUSD,
+            _producerUnitPriceMATIC: ApprovedProsumers[producerID - 1]._energyUnitPriceMatic,
             _producerPaybleAmount: MinPayableAmount
         });
 

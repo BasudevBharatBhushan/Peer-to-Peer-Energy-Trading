@@ -76,6 +76,8 @@ const ProsumerDashboard = () => {
 
   const [values, setValues] = useState({
     listProsumer: prosumer,
+    prosumerID: contractProsumer._prosumerID,
+    name: prosumer.name,
     unitPriceUSD: 0,
     unitPriceMatic: 0,
     stakedEnergy: 0,
@@ -85,6 +87,8 @@ const ProsumerDashboard = () => {
 
   const {
     listProsumer,
+    prosumerID,
+    name,
     unitPriceUSD,
     unitPriceMatic,
     stakedEnergy,
@@ -123,8 +127,10 @@ const ProsumerDashboard = () => {
     ) {
       try {
         setLoading(true);
+        let inputRegFee = regFee.toString();
         const ReqReg = await WriteContracts.req_Registration(
-          BigNumber.from(aadhar)
+          BigNumber.from(aadhar),
+          { value: ethers.utils.parseEther(inputRegFee) }
         );
         await ReqReg.wait(1);
         setLoading(false);
@@ -215,7 +221,7 @@ const ProsumerDashboard = () => {
     ) {
       try {
         setLoading(true);
-        const inputPrice = 1e10 * unitPriceUSD;
+        const inputPrice = 1e16 * unitPriceUSD;
         const Advert = await WriteContracts.advert(
           BigNumber.from(inputPrice),
           BigNumber.from(stakedEnergy)
@@ -225,6 +231,8 @@ const ProsumerDashboard = () => {
         alert(`Energy Listed Successfully \n
         Txn Hash: ${Advert.hash}
         `);
+
+        navigate("/");
       } catch (error) {
         setLoading(false);
         const serializedError = serializeError(error);
@@ -296,7 +304,12 @@ const ProsumerDashboard = () => {
   /*-------------------------------------------------------------------------------*/
 
   const onListChange = (name) => (event) => {
-    setValues({ ...values, error: false, [name]: event.target.value });
+    setValues({
+      ...values,
+      prosumerID: parseInt(contractProsumer._prosumerID.toString()),
+      error: false,
+      [name]: event.target.value,
+    });
   };
 
   const onList = (event) => {
@@ -318,6 +331,8 @@ const ProsumerDashboard = () => {
 
       createCard(prosumer, token, {
         listProsumer,
+        prosumerID,
+        name,
         unitPriceUSD,
         unitPriceMatic,
         stakedEnergy,
@@ -326,11 +341,11 @@ const ProsumerDashboard = () => {
           setValues({ ...values, error: data.error, success: false });
         } else {
           advert();
+          console.log(values);
           setValues({
             ...values,
             success: true,
           });
-          navigate("/");
         }
       });
     } else {
@@ -340,59 +355,66 @@ const ProsumerDashboard = () => {
 
   const ReqRegistrationForm = () => {
     return (
-      <div className="form-container">
-        <Segment inverted>
-          <Header>Request for Registration</Header>
-          <Form inverted>
-            <Form.Group widths="equal">
-              <Form.Input
-                fluid
-                label="Aadhar ID"
-                placeholder="12 Digit Aadhar ID"
-                onChange={(e) => {
-                  setAadhar(e.target.value);
-                }}
-              />
-            </Form.Group>
-            <Message negative>
-              <p>** Registration Fee: {regFee} Matic</p>
-            </Message>
-            <Form.Checkbox
-              onChange={(e) => {
-                if (tnc) {
-                  setTnc(false);
-                } else {
-                  setTnc(true);
-                }
-              }}
-              label="I agree to the Terms and Conditions"
-            />
-            {!tnc ? (
-              <Button type="submit" disabled>
-                Submit
-              </Button>
-            ) : (
-              <Button type="submit" onClick={reqReg}>
-                Submit
-              </Button>
-            )}
-          </Form>
-        </Segment>
+      <>
+        {!loading ? (
+          <div className="form-container">
+            <Segment inverted>
+              <Header>Request for Registration</Header>
+              <Form inverted>
+                <Form.Group widths="equal">
+                  <Form.Input
+                    fluid
+                    label="Aadhar ID"
+                    placeholder="12 Digit Aadhar ID"
+                    onChange={(e) => {
+                      setAadhar(e.target.value);
+                    }}
+                  />
+                </Form.Group>
+                <Message negative>
+                  <p>** Registration Fee: {regFee} Matic</p>
+                </Message>
+                <Form.Checkbox
+                  onChange={(e) => {
+                    if (tnc) {
+                      setTnc(false);
+                    } else {
+                      setTnc(true);
+                    }
+                  }}
+                  label="I agree to the Terms and Conditions"
+                />
+                {!tnc ? (
+                  <Button type="submit" disabled>
+                    Submit
+                  </Button>
+                ) : (
+                  <Button type="submit" onClick={reqReg}>
+                    Submit
+                  </Button>
+                )}
+              </Form>
+            </Segment>
 
-        <Header>Rules to Join into the Network</Header>
-        <li>
-          <i>Enter Valid Aadhar ID & Raise a request for registration</i>
-        </li>
-        <li>
-          <i>Network registration requires a nominal fee.</i>
-        </li>
-        <Header as="h4">Terms & Condition</Header>
-        <li>
-          <i>
-            Registration Fee is nonrefundable if escrow rejects your candidacy.
-          </i>
-        </li>
-      </div>
+            <Header>Rules to Join into the Network</Header>
+            <li>
+              <i>Enter Valid Aadhar ID & Raise a request for registration</i>
+            </li>
+            <li>
+              <i>Network registration requires a nominal fee.</i>
+            </li>
+            <Header as="h4">Terms & Condition</Header>
+            <li>
+              <i>
+                Registration Fee is nonrefundable if escrow rejects your
+                candidacy.
+              </i>
+            </li>
+          </div>
+        ) : (
+          LoaderAnimation()
+        )}
+      </>
     );
   };
 

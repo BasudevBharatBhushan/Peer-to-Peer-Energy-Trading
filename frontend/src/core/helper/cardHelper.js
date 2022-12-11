@@ -18,3 +18,30 @@ export const createCard = (prosumer, token, card) => {
     })
     .catch((err) => console.log(err));
 };
+
+export const deleteCard = (cardID) => {
+  return fetch(`${API}/card/${cardID}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      console.log("response", response);
+      return response;
+    })
+    .catch((err) => console.log(err));
+};
+
+export const updateCard = (cardID, card) => {
+  return fetch(`${API}/card/${cardID}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(card),
+  })
+    .then((response) => {
+      console.log(response);
+      return response;
+    })
+    .catch((err) => console.log(err));
+};

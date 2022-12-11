@@ -8,6 +8,7 @@ import { Grid, Segment, Button, Form, Header, Input } from "semantic-ui-react";
 import { isAuthenticated } from "../auth/helper/index";
 import { ReadContracts, WriteContracts } from "../blockchain/polygon";
 import { LoaderAnimation } from "../core/components/LoaderAnimation";
+import { createTxn, getAllTransaction } from "./helper/transactionapicall";
 
 const _ = require("lodash");
 
@@ -18,13 +19,45 @@ const EscrowDashboard = () => {
     EnergyBalance: undefined,
     RegFee: undefined,
   });
+
+  const [transactionValues, setTransactionValues] = useState({
+    _producer: "",
+    _consumer: "",
+    _producerID: "",
+    _consumerID: "",
+    _consumerEnergyNeed: "",
+    _producerUnitPrice: "",
+    // _producerUnitPriceUSD  TODO:
+    _producerPaybleAmount: "",
+  });
+
   const [loading, setLoading] = useState(false);
   const [registrationFee, setRegistrationFee] = useState();
   useEffect(() => {
     if (window.ethereum) {
       escrowProfile();
+      pendingTxn();
     }
   }, []);
+
+  const pendingTxn = async () => {
+    if (window.ethereum) {
+      const PendingTxn = await ReadContracts.Transaction(0);
+      console.log(PendingTxn);
+
+      // setTransactionValues({
+      //   _producer: PendingTxn._producer,
+      //   _consumer: PendingTxn._consumer,
+      //   _producerID: PendingTxn._producerID.toString(),
+      //   _consumerID: PendingTxn._consumerID.toString(),
+      //   _consumerEnergyNeed: PendingTxn._consumerEnergyNeed.toString(),
+      //   _producerUnitPrice: PendingTxn._producerUnitPrice.toString(),
+      //   // _producerUnitPriceUSD  TODO:
+      //   _producerPaybleAmount: PendingTxn._producerPaybleAmount.toString(),
+      // });
+    }
+    // console.log(transactionValues);
+  };
 
   const escrowProfile = async () => {
     if (window.ethereum) {
@@ -158,7 +191,9 @@ const EscrowDashboard = () => {
               <Segment inverted color="">
                 <Header as="h3">Escrow Profile</Header>
                 <li>Current Reg. Fee : {escrow_balance.RegFee} Matic</li>
-                <li>Matic Balance :{escrow_balance.MaticBalance} Matic </li>
+                <li>
+                  Matic Balance :{escrow_balance.MaticBalance / 1e18} Matic{" "}
+                </li>
                 <li>Energy Balance :{escrow_balance.EnergyBalance} Unit</li>
               </Segment>
               <Form>

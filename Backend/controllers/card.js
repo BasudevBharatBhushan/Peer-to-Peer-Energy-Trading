@@ -55,3 +55,19 @@ exports.removeCard = (req, res) => {
     });
   });
 };
+
+exports.updateCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    { _id: req.card._id },
+    { $set: req.body },
+    { new: true, useFindAndModify: false },
+    (err, card) => {
+      if (err) {
+        return res.status(400).json({
+          error: "Unable to Update the Card",
+        });
+      }
+      res.json(card);
+    }
+  );
+};
