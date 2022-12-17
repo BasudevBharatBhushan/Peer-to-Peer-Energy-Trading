@@ -27,6 +27,7 @@ const BidModal = ({
   const { prosumer } = isAuthenticated();
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState(0);
+  const [gasPrice, setGasPrice] = useState(0);
   // const [cardValues, setCardValues] = useState({
   //   stakedEnergy:stakedEnergy
   // })
@@ -53,10 +54,23 @@ const BidModal = ({
 
         const inputMatic = inputWei.toString();
 
+        await WriteContracts.estimateGas
+          .bid(BigNumber.from(prosumerID), BigNumber.from(inputValue), {
+            value: ethers.utils.parseEther(inputMatic),
+            gasLimit: 500000,
+          })
+          .then((data) => {
+            console.log(data.toString());
+            setGasPrice(parseInt(data.toString()) << 1);
+          });
+        console.log(gasPrice);
         const Bid = await WriteContracts.bid(
           BigNumber.from(prosumerID),
           BigNumber.from(inputValue),
-          { value: ethers.utils.parseEther(inputMatic), gasLimit: 500000 }
+          {
+            value: ethers.utils.parseEther(inputMatic),
+            gasLimit: gasPrice,
+          }
         );
 
         await Bid.wait(1);
@@ -70,7 +84,7 @@ const BidModal = ({
         setLoading(false);
         const serializedError = serializeError(error);
         alert(`Error: ${serializedError.data.originalError.reason}`);
-        console.log(serializedError.data.originalError.reason);
+        console.log(serializedError);
       }
     } else {
       alert(`Please Connect the Wallet with your Registered Address \n

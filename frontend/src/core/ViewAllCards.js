@@ -21,16 +21,15 @@ const ViewAllCards = () => {
         setObj(data);
         console.log("OBJECTS", obj[0]);
       });
-    getProsumer();
   }, []);
 
-  const getProsumer = async () => {
+  const getProsumer = async (id) => {
     if (window.ethereum) {
       const GetProsumer = await ReadContracts.show_Approved_Prosumers();
       setApprovedProsumers(GetProsumer);
       console.log();
       setUnitMaticPrice(
-        parseInt(GetProsumer[0]._energyUnitPriceMatic.toString()) / 1e18
+        parseInt(GetProsumer[id]._energyUnitPriceMatic.toString()) / 1e18
       );
     }
   };
@@ -41,6 +40,7 @@ const ViewAllCards = () => {
         <Transition.Group>
           {obj &&
             obj.map((card) => {
+              getProsumer(card.prosumerID - 1);
               return (
                 <Grid.Column>
                   <PostCard

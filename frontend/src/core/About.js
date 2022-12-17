@@ -7,7 +7,10 @@ const About = () => {
       <Base title="Peer-to-Peer Energy Trading using Blockchain" />
 
       <h1 style={{ textAlign: "center" }}>
-        <a href="https://github.com/BasudevBharatBhushan/Peer-to-Peer-Energy-Trading">
+        <a
+          target="._blank"
+          href="https://github.com/BasudevBharatBhushan/Peer-to-Peer-Energy-Trading"
+        >
           Github Repository
         </a>
       </h1>
