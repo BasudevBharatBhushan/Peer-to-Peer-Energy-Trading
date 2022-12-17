@@ -22,6 +22,7 @@ import { API } from "../backend";
 import { WriteContracts, ReadContracts } from "../blockchain/polygon";
 import { serializeError } from "eth-rpc-errors";
 import { LoaderAnimation } from "../core/components/LoaderAnimation";
+import { getTxns } from "../core/helper/transactionHelper";
 const _ = require("lodash");
 
 const ProsumerDashboard = () => {
@@ -49,12 +50,18 @@ const ProsumerDashboard = () => {
   const [regFee, setRegFee] = useState(0);
 
   const [loading, setLoading] = useState(false);
+  const [listLoading, setListLoading] = useState(false);
+  const [mintLoading, setMintLoading] = useState(false);
 
   const [aadhar, setAadhar] = useState(0);
 
   const [mintEnergy, setMintEnergy] = useState();
 
   const [burnEnergy, setBurnEnergy] = useState();
+
+  const [txns, setTxns] = useState([]);
+
+  const [txnCounter, setTxnCounter] = useState();
 
   const [balance, setBalance] = useState({
     energyTokenBalance: 0,
@@ -106,16 +113,43 @@ const ProsumerDashboard = () => {
     getAllCard();
     prosumerIDQuery();
     prosumerBalance();
+    getAllTxns();
   }, []);
 
   const getAllCard = async () => {
     await fetch(`${API}/card/all`)
       .then((response) => response.json())
       .then((data) => {
-        setCards(data);
         console.log(cards);
+        setCards(data);
       });
   };
+
+  const getAllTxns = () => {
+    const GetAllTxns = getTxns()
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setTxns(data);
+      });
+    console.log(txns);
+  };
+
+  // const getTxnsCount = () => {   //TODO: Feature to be implemented in Future, unable to figure out its waiting and printing state
+  //   if (txns) {
+  //     console.log("getTxnsCount Triggered");
+  //     const GetTxnsCount = txns.filter(
+  //       (e) =>
+  //         e.producerID === parseInt(contractProsumer._prosumerID.toString()) ||
+  //         e.consumerID === parseInt(contractProsumer._prosumerID.toString())
+  //     );
+
+  //     setTxnCounter(GetTxnsCount.length);
+  //   } else {
+  //     setTimeout(getTxnsCount, 300);
+  //   }
+  //   console.log(txnCounter);
+  // };
 
   /*--------------------------SMART CONTRACT FUNCTIONS----------------------------*/
 
@@ -157,18 +191,18 @@ const ProsumerDashboard = () => {
       window.ethereum.selectedAddress === _.toLower(prosumer.publicAddress)
     ) {
       try {
-        setLoading(true);
+        setMintLoading(true);
         const Mint = await WriteContracts.produceEnergy(
           BigNumber.from(mintEnergy)
         );
         await Mint.wait(1);
-        setLoading(false);
+        setMintLoading(false);
         setMintEnergy();
         alert(`Energy Produced \n
         Txn Hash: ${Mint.hash}
         `);
       } catch (error) {
-        setLoading(false);
+        setMintLoading(false);
         const serializedError = serializeError(error);
         alert(`Error: ${serializedError.data.originalError.reason}`);
         console.log(serializedError.data.originalError.reason);
@@ -188,18 +222,18 @@ const ProsumerDashboard = () => {
       window.ethereum.selectedAddress === _.toLower(prosumer.publicAddress)
     ) {
       try {
-        setLoading(true);
+        setMintLoading(true);
         const Burn = await WriteContracts.burnEnergy(
           BigNumber.from(burnEnergy)
         );
         await Burn.wait(1);
-        setLoading(false);
+        setMintLoading(false);
         setBurnEnergy();
         alert(`Energy Burned \n
         Txn Hash: ${Burn.hash}
         `);
       } catch (error) {
-        setLoading(false);
+        setMintLoading(false);
         const serializedError = serializeError(error);
         alert(`Error: ${serializedError.data.originalError.reason}`);
         console.log(serializedError.data.originalError.reason);
@@ -220,21 +254,21 @@ const ProsumerDashboard = () => {
       window.ethereum.selectedAddress === _.toLower(prosumer.publicAddress)
     ) {
       try {
-        setLoading(true);
+        setListLoading(true);
         const inputPrice = 1e16 * unitPriceUSD;
         const Advert = await WriteContracts.advert(
           BigNumber.from(inputPrice),
           BigNumber.from(stakedEnergy)
         );
         await Advert.wait(1);
-        setLoading(false);
+        setListLoading(false);
         alert(`Energy Listed Successfully \n
         Txn Hash: ${Advert.hash}
         `);
 
         navigate("/");
       } catch (error) {
-        setLoading(false);
+        setListLoading(false);
         const serializedError = serializeError(error);
         alert(`Error: ${serializedError.data.originalError.reason}`);
         console.log(serializedError.data.originalError.reason);
@@ -456,7 +490,7 @@ const ProsumerDashboard = () => {
         <Segment>
           <Grid columns={3}>
             <Grid.Column textAlign="center">
-              {!loading ? (
+              {!mintLoading ? (
                 <Segment>
                   <Form>
                     <Header as="h2">Energy Factory</Header>
@@ -498,20 +532,36 @@ const ProsumerDashboard = () => {
               <Segment>
                 <Segment inverted>Listing</Segment>
                 <h3>
-                  Stacked Energy:
+                  Staked Energy:
                   {contractProsumer._stakedEnergyBalance.toString()}
                 </h3>
-                <b>
-                  Price(USD): ${contractProsumer._energyUnitPriceUSD.toString()}
-                </b>
-                <p>
-                  Price(Matic):
-                  {contractProsumer._energyUnitPriceMatic.toString()} Matic
-                </p>
+                {parseInt(contractProsumer._stakedEnergyBalance.toString()) >
+                0 ? (
+                  <>
+                    <b>
+                      Price(USD): $
+                      {parseInt(
+                        contractProsumer._energyUnitPriceUSD.toString()
+                      ) / 1e16}
+                    </b>
+                    <p>
+                      Price(Matic):
+                      {parseInt(
+                        contractProsumer._energyUnitPriceMatic.toString()
+                      ) / 1e18}
+                      Matic
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <b>Price(USD): $ 0</b>
+                    <p>Price(Matic): 0 Matic</p>
+                  </>
+                )}
               </Segment>
             </Grid.Column>
             <Grid.Column textAlign="center">
-              {!loading ? (
+              {!listLoading ? (
                 <Segment>
                   <Form>
                     <Header as="h2" color="brown">
@@ -550,13 +600,83 @@ const ProsumerDashboard = () => {
     );
   };
 
+  const BuyTableBody = ({
+    date,
+    producerID,
+    tokensTransacted,
+    unitPriceUSD,
+    unitPriceMatic,
+    transactionHash,
+  }) => {
+    return (
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell textAlign="center">{date}</Table.Cell>
+          <Table.Cell textAlign="center" style={{ background: "red" }}>
+            Sell
+          </Table.Cell>
+          <Table.Cell textAlign="center">{producerID}</Table.Cell>
+          <Table.Cell textAlign="center">Debit</Table.Cell>
+
+          <Table.Cell textAlign="center">{tokensTransacted}</Table.Cell>
+
+          <Table.Cell textAlign="center">{unitPriceUSD}</Table.Cell>
+          <Table.Cell textAlign="center">{unitPriceMatic}</Table.Cell>
+
+          <Table.Cell textAlign="center">
+            <a
+              href={`https://mumbai.polygonscan.com/tx/${transactionHash}`}
+              target="._blank"
+            >
+              {transactionHash}
+            </a>
+          </Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    );
+  };
+  const SellTableBody = ({
+    date,
+    consumerID,
+    tokensTransacted,
+    unitPriceUSD,
+    unitPriceMatic,
+    transactionHash,
+  }) => {
+    return (
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell textAlign="center">{date}</Table.Cell>
+          <Table.Cell textAlign="center" style={{ background: "green" }}>
+            Buy
+          </Table.Cell>
+          <Table.Cell textAlign="center">{consumerID}</Table.Cell>
+          <Table.Cell textAlign="center">Credit</Table.Cell>
+
+          <Table.Cell textAlign="center">{tokensTransacted}</Table.Cell>
+
+          <Table.Cell textAlign="center">{unitPriceUSD}</Table.Cell>
+          <Table.Cell textAlign="center">{unitPriceMatic}</Table.Cell>
+
+          <Table.Cell textAlign="center">
+            <a
+              href={`https://mumbai.polygonscan.com/tx/${transactionHash}`}
+              target="._blank"
+            >
+              {transactionHash}
+            </a>
+          </Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    );
+  };
+
   return (
     <>
       {/*------------------- TOGGLE------------------------------------------------------------------- */}
       {component}
       {queryProsumerID > 0 ? (
         <>
-          {" "}
           <Segment compact style={{ display: "inline" }}>
             <b>
               SWITCH TO<span style={{ color: "teal" }}> {message}</span>
@@ -642,7 +762,7 @@ const ProsumerDashboard = () => {
           <Segment>
             <Table inverted>
               <Table.Header>
-                <Table.HeaderCell colSpan="7">
+                <Table.HeaderCell colSpan="8">
                   ENERGY TRANSACTIONS
                 </Table.HeaderCell>
                 <Table.Row>
@@ -661,45 +781,53 @@ const ProsumerDashboard = () => {
                     Unit Price [$]
                   </Table.HeaderCell>
                   <Table.HeaderCell textAlign="center">
-                    Txn. Hash
+                    Unit Price [Matic]
+                  </Table.HeaderCell>
+                  <Table.HeaderCell textAlign="center">
+                    Blockchain Transaction Hash
                   </Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
 
-              <Table.Body>
-                <Table.Row>
-                  <Table.Cell textAlign="center">John</Table.Cell>
-                  <Table.Cell
-                    textAlign="center"
-                    style={{ background: "green" }}
-                  >
-                    Buy
-                  </Table.Cell>
-                  <Table.Cell textAlign="center">1</Table.Cell>
-                  <Table.Cell textAlign="center">Credit</Table.Cell>
+              {txns &&
+                txns.map((e) => {
+                  if (
+                    e.producerID ===
+                    parseInt(contractProsumer._prosumerID.toString())
+                  ) {
+                    //Sold
 
-                  <Table.Cell textAlign="center">2</Table.Cell>
+                    return (
+                      <BuyTableBody
+                        date={e.txnDate.substring(0, 10)}
+                        producerID={e.producerID}
+                        tokensTransacted={e.tokensTransacted}
+                        unitPriceUSD={e.unitPriceUSD}
+                        unitPriceMatic={e.unitPriceMatic}
+                        transactionHash={e.transactionHash}
+                      />
+                    );
+                  } else if (
+                    e.consumerID ===
+                    parseInt(contractProsumer._prosumerID.toString())
+                  ) {
+                    //Buy
 
-                  <Table.Cell textAlign="center">0.001</Table.Cell>
-                  <Table.Cell textAlign="center">OX...</Table.Cell>
-                </Table.Row>
-              </Table.Body>
-
-              <Table.Footer>
-                <Table.Row>
-                  <Table.HeaderCell colSpan="3">
-                    Total Sold: <span style={{ color: "yellow" }}>30</span>
-                  </Table.HeaderCell>
-
-                  <Table.HeaderCell colSpan="3">
-                    Total Bought: <span style={{ color: "yellow" }}>10</span>{" "}
-                  </Table.HeaderCell>
-
-                  <Table.HeaderCell />
-                </Table.Row>
-              </Table.Footer>
+                    return (
+                      <SellTableBody
+                        date={e.txnDate.substring(0, 10)}
+                        consumerID={e.consumerID}
+                        tokensTransacted={e.tokensTransacted}
+                        unitPriceUSD={e.unitPriceUSD}
+                        unitPriceMatic={e.unitPriceMatic}
+                        transactionHash={e.transactionHash}
+                      />
+                    );
+                  }
+                  return <></>;
+                })}
             </Table>
-          </Segment>{" "}
+          </Segment>
         </>
       ) : (
         ReqRegistrationForm()

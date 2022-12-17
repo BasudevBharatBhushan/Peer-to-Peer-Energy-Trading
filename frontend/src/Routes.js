@@ -11,6 +11,8 @@ import AddProsumer from "./admin/AddProsumer";
 import ExecuteTransaction from "./admin/ExecuteTransaction";
 import About from "./core/About";
 import Card from "./core/Card";
+import ViewAllPendingTxns from "./admin/ViewAllPendingTxns";
+import ViewAllTransactions from "./core/ViewAllTransactions";
 
 /*---Admin Routes & Private Routes----*/
 import AdminRoutes from "./auth/helper/AdminRoutes";
@@ -25,6 +27,7 @@ const Routes = () => {
         <Route path="/signin" element={<Signin />} />
         <Route path="/about" element={<About />} />
         <Route path="/card" element={<Card />} />
+        <Route path="/transactions" element={<ViewAllTransactions />} />
 
         <Route exact path="/prosumer/dashboard" element={<PrivateRoutes />}>
           <Route
@@ -42,6 +45,17 @@ const Routes = () => {
         </Route>
         <Route exact path="/escrow/dashboard" element={<AdminRoutes />}>
           <Route exact path="/escrow/dashboard" element={<EscrowDashboard />} />
+        </Route>
+        <Route
+          exact
+          path="/escrow/pendingtransactions"
+          element={<AdminRoutes />}
+        >
+          <Route
+            exact
+            path="/escrow/pendingtransactions"
+            element={<ViewAllPendingTxns />}
+          />
         </Route>
       </Switch>
     </BrowserRouter>

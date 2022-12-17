@@ -13,9 +13,10 @@ exports.getTransactionById = (req, res, next, id) => {
 };
 
 exports.createTransaction = (req, res) => {
-  req.body.transaction.prosumer = req.profile;
+  // req.body.transaction.prosumer = req.profile;
+  console.log(req.body);
 
-  const transaction = new Transaction(req.body.transaction);
+  const transaction = new Transaction(req.body);
   transaction.save((err, transaction) => {
     if (err) {
       return res.status(400).json({

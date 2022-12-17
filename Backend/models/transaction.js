@@ -5,13 +5,23 @@ const TransactionSchema = new mongoose.Schema({
   txnDate: {
     type: Date,
   },
-  tokenSender: {
-    type: ObjectId,
-    ref: "Prosumer",
+  producerID: {
+    type: Number,
+    required: true,
   },
-  tokenReceiver: {
-    type: ObjectId,
-    ref: "Prosumer",
+  consumerID: {
+    type: Number,
+    required: true,
+  },
+  producerAddress: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  consumerAddress: {
+    type: String,
+    required: true,
+    trim: true,
   },
   tokensTransacted: {
     type: Number,
@@ -35,18 +45,9 @@ const TransactionSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  senderTokenBalance: {
-    //Balance during the time of transaction
-    type: Number,
-    required: true,
-  },
-  receiverTokenBalance: {
-    type: Number,
-    required: true,
-  },
 });
 
-const Transaction = mongoose.model("Transaction", TransactionSchema);
+module.exports = mongoose.model("Transaction", TransactionSchema);
 
 //Transaction Type
 // Sold Energy

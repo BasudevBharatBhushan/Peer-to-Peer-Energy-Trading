@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { API } from "../backend";
-import {
-  Button,
-  Card,
-  Grid,
-  Image,
-  Segment,
-  Transition,
-} from "semantic-ui-react";
+import { Grid, Transition } from "semantic-ui-react";
 import PostCard from "./components/PostCard";
 import { getProsumerById } from "../prosumer/helper/prosumerapicall";
 import { isAuthenticated } from "../auth/helper";

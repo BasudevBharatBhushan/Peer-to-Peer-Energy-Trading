@@ -31,13 +31,28 @@ const NavBar = ({ title = "TITLE GOES HERE", TitleColour = "black" }) => {
       />
 
       {isAuthenticated() && isAuthenticated().prosumer.role > 0 && (
-        <Menu.Item
-          name="Escrow Dashboard"
-          onClick={() => {
-            navigate("/escrow/dashboard");
-          }}
-        />
+        <>
+          <Menu.Item
+            name="Escrow Dashboard"
+            onClick={() => {
+              navigate("/escrow/dashboard");
+            }}
+          />
+          <Menu.Item
+            name="Pending Transactions"
+            onClick={() => {
+              navigate("/escrow/pendingtransactions");
+            }}
+          />
+        </>
       )}
+
+      <Menu.Item
+        name="View all Trades"
+        onClick={() => {
+          navigate("/transactions");
+        }}
+      />
 
       {isAuthenticated() && isAuthenticated().prosumer.role === 0 && (
         <Menu.Item

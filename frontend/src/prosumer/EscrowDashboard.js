@@ -9,10 +9,12 @@ import { isAuthenticated } from "../auth/helper/index";
 import { ReadContracts, WriteContracts } from "../blockchain/polygon";
 import { LoaderAnimation } from "../core/components/LoaderAnimation";
 import { createTxn, getAllTransaction } from "./helper/transactionapicall";
+import { useNavigate } from "react-router-dom";
 
 const _ = require("lodash");
 
 const EscrowDashboard = () => {
+  const navigate = useNavigate();
   const { prosumer: owner } = isAuthenticated();
   const [escrow_balance, setEscrow_balance] = useState({
     MaticBalance: undefined,
@@ -216,9 +218,15 @@ const EscrowDashboard = () => {
                 </Button>
               </Form>
               <Segment>
-                <Header>Caution!!!</Header>
-                <Button color="red" fluid onClick={processTrade}>
-                  Process Pending Trades
+                <Button
+                  color="red"
+                  fluid
+                  size="massive"
+                  onClick={() => {
+                    navigate("/escrow/pendingtransactions");
+                  }}
+                >
+                  View Pending Transactions
                 </Button>
               </Segment>
             </Grid.Column>
