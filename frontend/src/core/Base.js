@@ -1,9 +1,11 @@
 import "../App.css";
 import React, { Children } from "react";
 import NavBar from "./NavBar";
+import { useNavigate } from "react-router-dom";
 import { Button, Divider, Grid, Image, Segment, Icon } from "semantic-ui-react";
 
 const Base = ({ title = "My Title", TitleColour = "black", children }) => {
+  const navigate = useNavigate();
   return (
     <div>
       <NavBar title={title} TitleColour={TitleColour} />
@@ -17,7 +19,7 @@ const Base = ({ title = "My Title", TitleColour = "black", children }) => {
       >
         <Grid columns={2} relaxed="very">
           <Grid.Column>
-            <div>
+            <div style={{ display: "block" }}>
               <Segment
                 style={{
                   width: "20%",

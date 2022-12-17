@@ -193,14 +193,14 @@ const ProsumerDashboard = () => {
       try {
         setMintLoading(true);
         const Mint = await WriteContracts.produceEnergy(
-          BigNumber.from(mintEnergy)
+          BigNumber.from(mintEnergy, { gasLimit: 40000 })
         );
         await Mint.wait(1);
-        setMintLoading(false);
-        setMintEnergy();
         alert(`Energy Produced \n
         Txn Hash: ${Mint.hash}
         `);
+        setMintLoading(false);
+        setMintEnergy();
       } catch (error) {
         setMintLoading(false);
         const serializedError = serializeError(error);

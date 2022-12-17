@@ -85,7 +85,7 @@ const PostCard = ({
         >
           <p>Unit Price (USD): ${uintPriceUSD}</p>
         </Segment>
-        <b>≈ {unitPriceMatic} Matic</b>
+        <p>≈ {unitPriceMatic} Matic</p>
 
         <ModalForm />
         <i style={{ color: "Red" }}>

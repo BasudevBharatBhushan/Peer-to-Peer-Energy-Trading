@@ -221,12 +221,23 @@ const EscrowDashboard = () => {
                 <Button
                   color="red"
                   fluid
-                  size="massive"
+                  size="huge"
                   onClick={() => {
                     navigate("/escrow/pendingtransactions");
                   }}
                 >
                   View Pending Transactions
+                </Button>
+              </Segment>
+              <Segment>
+                <Button
+                  color="yellow"
+                  fluid
+                  onClick={() => {
+                    navigate("/escrow/transferownership");
+                  }}
+                >
+                  Transfer Ownership
                 </Button>
               </Segment>
             </Grid.Column>

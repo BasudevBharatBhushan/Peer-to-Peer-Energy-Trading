@@ -56,7 +56,7 @@ const BidModal = ({
         const Bid = await WriteContracts.bid(
           BigNumber.from(prosumerID),
           BigNumber.from(inputValue),
-          { value: ethers.utils.parseEther(inputMatic) }
+          { value: ethers.utils.parseEther(inputMatic), gasLimit: 500000 }
         );
 
         await Bid.wait(1);

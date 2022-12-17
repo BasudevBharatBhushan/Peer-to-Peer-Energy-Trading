@@ -13,6 +13,7 @@ import About from "./core/About";
 import Card from "./core/Card";
 import ViewAllPendingTxns from "./admin/ViewAllPendingTxns";
 import ViewAllTransactions from "./core/ViewAllTransactions";
+import TransferOwnership from "./admin/TransferOwnership";
 
 /*---Admin Routes & Private Routes----*/
 import AdminRoutes from "./auth/helper/AdminRoutes";
@@ -55,6 +56,13 @@ const Routes = () => {
             exact
             path="/escrow/pendingtransactions"
             element={<ViewAllPendingTxns />}
+          />
+        </Route>
+        <Route exact path="/escrow/transferownership" element={<AdminRoutes />}>
+          <Route
+            exact
+            path="/escrow/transferownership"
+            element={<TransferOwnership />}
           />
         </Route>
       </Switch>

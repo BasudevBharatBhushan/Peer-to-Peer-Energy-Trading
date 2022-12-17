@@ -4,10 +4,13 @@ import { Grid, Transition } from "semantic-ui-react";
 import PostCard from "./components/PostCard";
 import { getProsumerById } from "../prosumer/helper/prosumerapicall";
 import { isAuthenticated } from "../auth/helper";
+import { ReadContracts } from "../blockchain/polygon";
 
 const ViewAllCards = () => {
   const [obj, setObj] = useState([]);
   const { prosumer, token } = isAuthenticated();
+  const [approvedProsumers, setApprovedProsumers] = useState([]);
+  const [unitMaticPrice, setUnitMaticPrice] = useState(0);
 
   const [queryProsumer, setQueryProsumer] = useState({});
 
@@ -18,14 +21,18 @@ const ViewAllCards = () => {
         setObj(data);
         console.log("OBJECTS", obj[0]);
       });
+    getProsumer();
   }, []);
 
-  const getProsumer = async (prosumerID) => {
-    const x = await getProsumerById(prosumerID).then((data) => {
-      return data;
-    });
-    console.log(x);
-    console.log(queryProsumer);
+  const getProsumer = async () => {
+    if (window.ethereum) {
+      const GetProsumer = await ReadContracts.show_Approved_Prosumers();
+      setApprovedProsumers(GetProsumer);
+      console.log();
+      setUnitMaticPrice(
+        parseInt(GetProsumer[0]._energyUnitPriceMatic.toString()) / 1e18
+      );
+    }
   };
 
   return (
@@ -42,7 +49,7 @@ const ViewAllCards = () => {
                     Prosumer_Name={card.name}
                     stakedEnergy={card.stakedEnergy}
                     uintPriceUSD={card.unitPriceUSD}
-                    unitPriceMatic={card.unitPriceMatic}
+                    unitPriceMatic={unitMaticPrice}
                   />
                 </Grid.Column>
               );

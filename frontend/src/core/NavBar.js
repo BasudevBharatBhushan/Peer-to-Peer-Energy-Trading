@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { Fragment, useState, useEffect } from "react";
-import { Button, Menu, Segment, Header } from "semantic-ui-react";
+import { Button, Menu, Segment, Header, Icon } from "semantic-ui-react";
 import { signout, isAuthenticated } from "../auth/helper";
 import { ConnectWallet } from "./components/ConnectWallet.js";
 
@@ -47,13 +47,6 @@ const NavBar = ({ title = "TITLE GOES HERE", TitleColour = "black" }) => {
         </>
       )}
 
-      <Menu.Item
-        name="View all Trades"
-        onClick={() => {
-          navigate("/transactions");
-        }}
-      />
-
       {isAuthenticated() && isAuthenticated().prosumer.role === 0 && (
         <Menu.Item
           name="Dashboard"
@@ -62,6 +55,13 @@ const NavBar = ({ title = "TITLE GOES HERE", TitleColour = "black" }) => {
           }}
         />
       )}
+
+      <Menu.Item
+        name="View all Trades"
+        onClick={() => {
+          navigate("/transactions");
+        }}
+      />
 
       <Menu.Item>
         <Segment
@@ -91,6 +91,14 @@ const NavBar = ({ title = "TITLE GOES HERE", TitleColour = "black" }) => {
             )}
           </>
         )}
+        <Menu.Item>
+          <Icon
+            name="refresh"
+            onClick={() => {
+              window.location.reload();
+            }}
+          />
+        </Menu.Item>
         <Menu.Item
           name="About"
           onClick={() => {
