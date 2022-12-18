@@ -27,7 +27,6 @@ const ViewAllCards = () => {
     if (window.ethereum) {
       const GetProsumer = await ReadContracts.show_Approved_Prosumers();
       setApprovedProsumers(GetProsumer);
-      console.log();
       setUnitMaticPrice(
         parseInt(GetProsumer[id]._energyUnitPriceMatic.toString()) / 1e18
       );
@@ -40,7 +39,8 @@ const ViewAllCards = () => {
         <Transition.Group>
           {obj &&
             obj.map((card) => {
-              getProsumer(card.prosumerID - 1);
+              const x = card.prosumerID - 1;
+              getProsumer(x);
               return (
                 <Grid.Column>
                   <PostCard
