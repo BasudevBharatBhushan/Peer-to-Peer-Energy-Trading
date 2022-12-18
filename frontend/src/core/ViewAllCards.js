@@ -10,9 +10,9 @@ const ViewAllCards = () => {
   const [obj, setObj] = useState([]);
   const { prosumer, token } = isAuthenticated();
   const [approvedProsumers, setApprovedProsumers] = useState([]);
-  const [unitMaticPrice, setUnitMaticPrice] = useState(0);
+  const [unitMaticPrice, setUnitMaticPrice] = useState([]);
 
-  const [queryProsumer, setQueryProsumer] = useState({});
+  const [queryProsumer, setQueryProsumer] = useState();
 
   useEffect(() => {
     fetch(`${API}/card/all`)
@@ -21,15 +21,30 @@ const ViewAllCards = () => {
         setObj(data);
         console.log("OBJECTS", obj[0]);
       });
+    getProsumer();
   }, []);
 
-  const getProsumer = async (id) => {
+  const getProsumer = async () => {
     if (window.ethereum) {
       const GetProsumer = await ReadContracts.show_Approved_Prosumers();
       setApprovedProsumers(GetProsumer);
-      setUnitMaticPrice(
-        parseInt(GetProsumer[id]._energyUnitPriceMatic.toString()) / 1e18
-      );
+
+      // if(approvedProsumers){
+      //   approvedProsumers.map((e)=>{
+      //     setUnit
+      //   })
+      // }
+
+      // setUnitMaticPrice(
+      //   parseInt(GetProsumer[id]._energyUnitPriceMatic.toString()) / 1e18
+      // );
+
+      // const GetProsumer = await ReadContracts.ApprovedProsumers(id);
+      // setQueryProsumer(GetProsumer);
+
+      // setUnitMaticPrice(
+      //   parseInt(queryProsumer._energyUnitPriceMatic.toString()) / 1e18
+      // );
     }
   };
 
@@ -40,7 +55,9 @@ const ViewAllCards = () => {
           {obj &&
             obj.map((card) => {
               const x = card.prosumerID - 1;
-              getProsumer(x);
+
+              const y =
+                approvedProsumers[x]._energyUnitPriceMatic.toString() / 1e18;
               return (
                 <Grid.Column>
                   <PostCard
@@ -49,7 +66,7 @@ const ViewAllCards = () => {
                     Prosumer_Name={card.name}
                     stakedEnergy={card.stakedEnergy}
                     uintPriceUSD={card.unitPriceUSD}
-                    unitPriceMatic={unitMaticPrice}
+                    unitPriceMatic={y}
                   />
                 </Grid.Column>
               );
