@@ -87,7 +87,8 @@ const PostCard = ({
         </Segment>
         <p>≈ {unitPriceMatic} Matic</p>
 
-        <ModalForm />
+        {/* <ModalForm /> */}
+        {ModalForm()}
         <i style={{ color: "Red" }}>
           Note: You need to be a registered Prosumer
         </i>
