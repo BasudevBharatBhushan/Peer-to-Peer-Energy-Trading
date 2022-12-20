@@ -24,7 +24,7 @@ export const deleteCard = (cardID) => {
     method: "DELETE",
   })
     .then((response) => {
-      console.log("response", response);
+      console.log("response._id", response);
       return response;
     })
     .catch((err) => console.log(err));

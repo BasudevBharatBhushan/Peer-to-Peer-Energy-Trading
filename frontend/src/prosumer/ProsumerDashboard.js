@@ -16,7 +16,7 @@ import {
 } from "semantic-ui-react";
 import { ethers, BigNumber } from "ethers";
 import { useNavigate } from "react-router-dom";
-import { createCard } from "../core/helper/cardHelper";
+import { createCard, updateCard, deleteCard } from "../core/helper/cardHelper";
 import { isAuthenticated } from "../auth/helper";
 import { API } from "../backend";
 import { WriteContracts, ReadContracts } from "../blockchain/polygon";
@@ -151,6 +151,23 @@ const ProsumerDashboard = () => {
   //   console.log(txnCounter);
   // };
 
+  const updateMaticCard = async (id) => {
+    if (window.ethereum) {
+      let x = parseInt(contractProsumer._prosumerID.toString()) - 1;
+
+      const GetProsumer = await ReadContracts.ApprovedProsumers(x);
+
+      updateCard(id, {
+        unitPriceMatic:
+          parseInt(GetProsumer._energyUnitPriceMatic.toString()) / 1e18,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+        });
+    }
+  };
+
   /*--------------------------SMART CONTRACT FUNCTIONS----------------------------*/
 
   //--> Reg Registration
@@ -247,7 +264,7 @@ const ProsumerDashboard = () => {
 
   //--> Advert
 
-  const advert = async () => {
+  const advert = async (id) => {
     //advert = advertise energy (couldn't come up with better name)
     if (
       window.ethereum &&
@@ -269,6 +286,7 @@ const ProsumerDashboard = () => {
         navigate("/");
       } catch (error) {
         setListLoading(false);
+        deleteCard(id);
         const serializedError = serializeError(error);
         alert(`Error: ${serializedError.data.originalError.reason}`);
         console.log(serializedError.data.originalError.reason);
@@ -370,18 +388,23 @@ const ProsumerDashboard = () => {
         unitPriceUSD,
         unitPriceMatic,
         stakedEnergy,
-      }).then((data) => {
-        if (data.error) {
-          setValues({ ...values, error: data.error, success: false });
-        } else {
-          advert();
-          console.log(values);
-          setValues({
-            ...values,
-            success: true,
-          });
-        }
-      });
+      })
+        .then((response) => response.json())
+
+        .then((data) => {
+          if (data.error) {
+            setValues({ ...values, error: data.error, success: false });
+            alert("You have already Listed Energy");
+          } else {
+            advert(data._id);
+            console.log(data._id);
+            updateMaticCard(data._id);
+            setValues({
+              ...values,
+              success: true,
+            });
+          }
+        });
     } else {
       alert("You Have already Listed your Energy");
     }
