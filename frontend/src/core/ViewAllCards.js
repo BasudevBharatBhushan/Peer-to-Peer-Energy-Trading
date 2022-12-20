@@ -9,7 +9,17 @@ import { ReadContracts } from "../blockchain/polygon";
 const ViewAllCards = () => {
   const [obj, setObj] = useState([]);
   const { prosumer, token } = isAuthenticated();
-  const [approvedProsumers, setApprovedProsumers] = useState([]);
+  const [approvedProsumers, setApprovedProsumers] = useState([
+    {
+      _prosumerID: 0,
+      _address: "",
+      _aadharId: 0, //12 digit
+      _approved: true,
+      _energyUnitPriceUSD: 0,
+      _energyUnitPriceMatic: 0,
+      _stakedEnergyBalance: 0,
+    },
+  ]);
   const [unitMaticPrice, setUnitMaticPrice] = useState([]);
 
   const [queryProsumer, setQueryProsumer] = useState();
