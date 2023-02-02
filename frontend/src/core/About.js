@@ -14,6 +14,7 @@ const About = () => {
           Github Repository
         </a>
       </h1>
+      
     </div>
   );
 };

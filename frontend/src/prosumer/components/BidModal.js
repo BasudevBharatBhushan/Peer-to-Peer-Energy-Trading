@@ -14,6 +14,7 @@ import { ethers, BigNumber } from "ethers";
 import { isAuthenticated } from "../../auth/helper";
 import { updateCard, deleteCard } from "../../core/helper/cardHelper";
 import { useNavigate } from "react-router-dom";
+import MyPopup from "../../util/MyPopup";
 const _ = require("lodash");
 
 const BidModal = ({
@@ -100,13 +101,16 @@ const BidModal = ({
           <Segment inverted>
             <Form inverted>
               <Form.Group widths="equal">
-                <Form.Input
+              <MyPopup content={"Enter the KW of Energy you want to purchase"} position="right center" size="small">
+              <Form.Input
                   label="Energy Needs"
-                  placeholder="Unit of Energy"
+                  placeholder="KW of Energy"
                   onChange={(e) => {
                     setInputValue(e.target.value);
                   }}
                 />
+              </MyPopup>
+                
               </Form.Group>
               <Message floating>
                 <Message.Header>Payable Price:</Message.Header>
@@ -117,9 +121,12 @@ const BidModal = ({
                   USD: $ {unitPriceUSD * inputValue}
                 </p>
               </Message>
+              <MyPopup content={"Place Order"} position="center">
               <Button type="submit" color="orange" onClick={bid}>
                 Bid
               </Button>
+              </MyPopup>
+             
             </Form>
           </Segment>
         </Modal.Description>

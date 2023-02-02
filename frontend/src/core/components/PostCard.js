@@ -13,6 +13,7 @@ import { isAuthenticated } from "../../auth/helper";
 import myImage from "../../img/green-bulb.png";
 import thankyou from "../../img/Thankyou.png";
 import BidModal from "../../prosumer/components/BidModal";
+import MyPopup from "../../util/MyPopup";
 
 const PostCard = ({
   Prosumer_id = "1",
@@ -68,7 +69,7 @@ const PostCard = ({
       <Card.Content>
         <Segment inverted color="green">
           <h3 style={{ textAlign: "center", color: "black" }}>
-            {stakedEnergy} Units
+            {stakedEnergy} KW
             <span style={{ color: "red" }}> Energy For Sale</span>
           </h3>
         </Segment>

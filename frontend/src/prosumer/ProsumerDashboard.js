@@ -23,6 +23,7 @@ import { WriteContracts, ReadContracts } from "../blockchain/polygon";
 import { serializeError } from "eth-rpc-errors";
 import { LoaderAnimation } from "../core/components/LoaderAnimation";
 import { getTxns } from "../core/helper/transactionHelper";
+import MyPopup from "../util/MyPopup";
 const _ = require("lodash");
 
 const ProsumerDashboard = () => {
@@ -521,7 +522,7 @@ const ProsumerDashboard = () => {
               {!mintLoading ? (
                 <Segment>
                   <Form>
-                    <Header as="h2">Energy Factory</Header>
+                    <Header as="h2">Energy Balance Synchronizer</Header>
                     <Form.Field inline>
                       <label>Produce Energy</label>
                       <Input
@@ -529,31 +530,38 @@ const ProsumerDashboard = () => {
                         onChange={(e) => {
                           setMintEnergy(e.target.value);
                         }}
-                        placeholder="Unit of Energy"
+                        placeholder="KW of Energy"
                       />
-                      <Button positive onClick={mint}>
-                        Produce Energy
-                      </Button>
-                      {/* <p>Mint Message</p> */}
+                     <MyPopup content="Increment Energy Balance" position="top center">
+                     <Button positive onClick={mint} icon="plus circle" />
+                     </MyPopup>
+                     
+        
                     </Form.Field>
                     <Form.Field inline>
                       <label>Burn Energy</label>
                       <Input
-                        placeholder="Unit of Energy"
+                        placeholder="KW of Energy"
                         type="number"
                         onChange={(e) => {
                           setBurnEnergy(e.target.value);
                         }}
                       />
-                      <Button color="red" onClick={burn}>
-                        Burn Energy
-                      </Button>
-                      {/* <p>Burn Message</p> */}
+                      <MyPopup content="Decrement Energy Balance" position="top center">
+                      <Button color="red" onClick={burn}
+                      icon="minus circle"
+                       />
+                      </MyPopup>
+                      
+          
                     </Form.Field>
+                    <Message info>
+                      <p>These are Energy Sync Function that updates energy balance in real-time with energy meter through <br/> IoT Technology</p>
+                    </Message>
                   </Form>
                 </Segment>
               ) : (
-                LoaderAnimation()
+                LoaderAnimation() 
               )}
             </Grid.Column>
             <Grid.Column textAlign="center">
@@ -593,29 +601,36 @@ const ProsumerDashboard = () => {
                 <Segment>
                   <Form>
                     <Header as="h2" color="brown">
-                      List Your Energy
+                      List Your Energy in Marketplace
                     </Header>
+                    <MyPopup content="Enter the Kilo Watts of Energy to be Listed" position="center">
                     <Form.Field inline>
                       <label>Energy Unit </label>
                       <Input
-                        placeholder="Unit of Energy for Listing"
+                        placeholder="Kilo Watt"
                         type="number"
                         onChange={onListChange("stakedEnergy")}
                         value={stakedEnergy}
                       />
                     </Form.Field>
-                    <Form.Field inline>
+                    </MyPopup>
+                   <MyPopup content={"Set the price for 1 KW of energy "} position="center">
+                   <Form.Field inline>
                       <label>Price(USD) </label>
                       <Input
-                        placeholder="Price for 1 Unit"
+                        placeholder="Price for 1 KW"
                         onChange={onListChange("unitPriceUSD")}
                         type="number"
                         value={unitPriceUSD}
                       />
                     </Form.Field>
+                   </MyPopup>
+                    <MyPopup content={"List your Energy to Sell"} position="center">
                     <Button color="blue" onClick={onList}>
                       List
                     </Button>
+                    </MyPopup>
+                    
                   </Form>
                 </Segment>
               ) : (
@@ -703,7 +718,7 @@ const ProsumerDashboard = () => {
     <>
       {/*------------------- TOGGLE------------------------------------------------------------------- */}
       {/* {component} */}
-      <Base title={toggleState.message} TitleColour="grey" />
+      <Base title={toggleState.message === "CONSUMER MODE" ? "PROSUMER DASHBOARD" : "CONSUMER DASHBOARD"} TitleColour="grey" />
       {queryProsumerID > 0 ? (
         <>
           <Segment compact style={{ display: "inline" }}>
@@ -769,14 +784,14 @@ const ProsumerDashboard = () => {
                     Energy :
                     <span style={{ color: "yellow" }}>
                       {" "}
-                      {balance.energyTokenBalance.toString()} units
+                      {balance.energyTokenBalance.toString()} KW
                     </span>
                   </h4>
                   <b>
                     Matic :
                     <span style={{ color: "yellow" }}>
                       {" "}
-                      {balance.maticCoinBalance.toString()} coins
+                      {balance.maticCoinBalance.toString()} Coins
                     </span>
                   </b>
                 </Segment>

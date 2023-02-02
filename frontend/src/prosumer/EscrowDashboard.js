@@ -10,6 +10,7 @@ import { ReadContracts, WriteContracts } from "../blockchain/polygon";
 import { LoaderAnimation } from "../core/components/LoaderAnimation";
 import { createTxn, getAllTransaction } from "./helper/transactionapicall";
 import { useNavigate } from "react-router-dom";
+import MyPopup from "../util/MyPopup";
 
 const _ = require("lodash");
 
@@ -196,29 +197,38 @@ const EscrowDashboard = () => {
                 <li>
                   Matic Balance :{escrow_balance.MaticBalance / 1e18} Matic{" "}
                 </li>
-                <li>Energy Balance :{escrow_balance.EnergyBalance} Unit</li>
+                <li>Energy Balance :{escrow_balance.EnergyBalance} KW</li>
               </Segment>
               <Form>
                 <Header as="h2" color="brown">
                   Escrow Functions
                 </Header>
                 <Form.Field inline>
-                  <Button onClick={setRegFee} color="orange">
+                <MyPopup content={"Set the Registration Fee for Admission of User in the network"} position="right center">
+                <Button onClick={setRegFee} color="orange">
                     Set Reg Fee
                   </Button>
+                </MyPopup>
+                 
                   <Input
                     placeholder="Reg Fee for users (Matic)"
                     onChange={(e) => {
                       setRegistrationFee(e.target.value);
                     }}
                   />
+                  <br/>
+                  <p><i style={{"color":"red"}}>Note: If you wish to set Reg. Fee more than $0.001, then <span style={{"color":"blue"}}><a href="https://mumbai.polygonscan.com/address/0x8405530272edF14FB5F9671fc25d3efC16a8B5D4#writeContract#F15" target="._blank">click here</a></span></i></p>
                 </Form.Field>
+                <MyPopup content={"This function will equally distribute the RegFee among all the owners"} position="right center"> 
                 <Button onClick={withdrawFee} color="teal">
-                  Witdhraw Fees
+                withdraw Fees
                 </Button>
+                </MyPopup>
+               
               </Form>
               <Segment>
-                <Button
+              <MyPopup content={"View the Pending Energy Transaction in the Network"} position={"center"}>
+              <Button
                   color="red"
                   fluid
                   size="huge"
@@ -228,9 +238,12 @@ const EscrowDashboard = () => {
                 >
                   View Pending Transactions
                 </Button>
+              </MyPopup>
+               
               </Segment>
               <Segment>
-                <Button
+              <MyPopup content={"Transfer the ownership to a different Address"} position={"center"}>
+              <Button
                   color="yellow"
                   fluid
                   onClick={() => {
@@ -239,6 +252,8 @@ const EscrowDashboard = () => {
                 >
                   Transfer Ownership
                 </Button>
+              </MyPopup>
+             
               </Segment>
             </Grid.Column>
           </Grid>
