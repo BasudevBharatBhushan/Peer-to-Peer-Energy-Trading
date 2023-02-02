@@ -1,12 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Base from "./Base";
 import { Link } from "react-router-dom";
 import { Button, Segment, Image } from "semantic-ui-react";
 import ViewAllCards from "./ViewAllCards";
 import { isAuthenticated } from "../auth/helper";
 import logo from "../img/logo.png";
+import { INR_to_USD } from "./helper/priceConverter";
 
 const Home = () => {
+
+
   return (
     <div>
       <Base title="One Step to the Green Future" TitleColour="green" />

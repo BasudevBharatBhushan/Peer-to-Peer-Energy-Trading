@@ -4,14 +4,7 @@ import { Link, Navigate } from "react-router-dom";
 import { isAuthenticated } from "../auth/helper";
 import { createCard, getAllCards } from "./helper/cardHelper";
 import { API } from "../backend";
-import {
-  Button,
-  Form,
-  Message,
-  Segment,
-  Dimmer,
-  Loader,
-} from "semantic-ui-react";
+
 
 const Card = () => {
   const [obj, setObj] = useState([]);

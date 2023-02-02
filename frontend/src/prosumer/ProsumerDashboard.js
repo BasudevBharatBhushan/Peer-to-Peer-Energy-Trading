@@ -478,7 +478,9 @@ const ProsumerDashboard = () => {
   const ProsumerForm = () => {
     return (
       <div>
-        <Base title="Prosumer Dashboard" TitleColour="blue" />
+        {/* <Base title="Prosumer Dashboard" TitleColour="blue" /> */}
+        {/* TODO: Value not changing in real time */}
+        <Base title="Dashboard" TitleColour="grey" />
       </div>
     );
   };
@@ -486,7 +488,10 @@ const ProsumerDashboard = () => {
   const ConsumerForm = () => {
     return (
       <div>
-        <Base title="Consumer Dashboard" TitleColour="grey" />
+        {/* <Base title="Consumer Dashboard" TitleColour="grey" /> */}
+        {/* TODO:  Value not changing in real time*/}
+
+        <Base title="Dashboard" TitleColour="grey" />
       </div>
     );
   };
@@ -527,9 +532,9 @@ const ProsumerDashboard = () => {
                         placeholder="Unit of Energy"
                       />
                       <Button positive onClick={mint}>
-                        Mint
+                        Produce Energy
                       </Button>
-                      <p>Mint Message</p>
+                      {/* <p>Mint Message</p> */}
                     </Form.Field>
                     <Form.Field inline>
                       <label>Burn Energy</label>
@@ -541,9 +546,9 @@ const ProsumerDashboard = () => {
                         }}
                       />
                       <Button color="red" onClick={burn}>
-                        Burn
+                        Burn Energy
                       </Button>
-                      <p>Burn Message</p>
+                      {/* <p>Burn Message</p> */}
                     </Form.Field>
                   </Form>
                 </Segment>
@@ -697,7 +702,8 @@ const ProsumerDashboard = () => {
   return (
     <>
       {/*------------------- TOGGLE------------------------------------------------------------------- */}
-      {component}
+      {/* {component} */}
+      <Base title={toggleState.message} TitleColour="grey" />
       {queryProsumerID > 0 ? (
         <>
           <Segment compact style={{ display: "inline" }}>

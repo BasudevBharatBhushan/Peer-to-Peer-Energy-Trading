@@ -4,6 +4,7 @@ import { Grid, Transition } from "semantic-ui-react";
 import PostCard from "./components/PostCard";
 import { getProsumerById } from "../prosumer/helper/prosumerapicall";
 import { isAuthenticated } from "../auth/helper";
+import { INR_to_USD } from "./helper/priceConverter";
 
 const ViewAllCards = () => {
   const [obj, setObj] = useState([]);
@@ -16,7 +17,12 @@ const ViewAllCards = () => {
         setObj(data);
         console.log("OBJECTS", obj[0]);
       });
+
   }, []);
+
+  // const inr_to_usd = ()=>{
+  //   const usdPrice = 
+  // }
 
   return (
     <Grid columns={3} divided="vertically">

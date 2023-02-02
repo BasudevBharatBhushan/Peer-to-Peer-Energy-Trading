@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   Button,
   Card,
@@ -8,6 +9,7 @@ import {
   Modal,
   Header,
 } from "semantic-ui-react";
+import { isAuthenticated } from "../../auth/helper";
 import myImage from "../../img/green-bulb.png";
 import thankyou from "../../img/Thankyou.png";
 import BidModal from "../../prosumer/components/BidModal";
@@ -21,6 +23,8 @@ const PostCard = ({
   cardID,
 }) => {
   const [open, setOpen] = React.useState(false);
+  const { prosumer, token } = isAuthenticated();
+
 
   const ModalForm = () => {
     return (
@@ -30,9 +34,10 @@ const PostCard = ({
         onOpen={() => setOpen(true)}
         open={open}
         trigger={
-          <Button color="orange" size="small">
+          <Button color="orange" size="small" disabled={prosumer.name === Prosumer_Name?true:false } >  
             Buy Now
           </Button>
+           //TODO: TEch Debt - The username is not made unique
         }
       >
         <Modal.Header>
