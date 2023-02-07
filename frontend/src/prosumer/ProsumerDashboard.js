@@ -524,53 +524,80 @@ const ProsumerDashboard = () => {
                   <Form>
                     <Header as="h2">Energy Balance Synchronizer</Header>
                     <Form.Field inline>
-                      <label>Produce Energy</label>
-                      <Input
-                        type="number"
-                        onChange={(e) => {
-                          setMintEnergy(e.target.value);
-                        }}
-                        placeholder="KW of Energy"
-                      />
-                     <MyPopup content="Increment Energy Balance" position="top center">
-                     <Button positive onClick={mint} icon="plus circle" />
-                     </MyPopup>
-                     
-        
+                      {/* <label>Produce Energy</label> */}
+                      <MyPopup
+                        content={`Create Energy Tokens for Prosumer Id ${contractProsumer._prosumerID.toString()}`}
+                        position="top center"
+                      ></MyPopup>
+                      <MyPopup
+                        content={`Enter the no. of Energy Tokens to be created for Prosumer Id ${contractProsumer._prosumerID.toString()}`}
+                        position="top center"
+                      >
+                        <Input
+                          type="number"
+                          onChange={(e) => {
+                            setMintEnergy(e.target.value);
+                          }}
+                          placeholder="KW of Energy"
+                        />
+                      </MyPopup>
+
+                      <MyPopup
+                        content={`Create Energy Tokens for Prosumer Id ${contractProsumer._prosumerID.toString()}`}
+                        position="top center"
+                      >
+                        <Button positive onClick={mint}>
+                          Produce Energy
+                        </Button>
+                      </MyPopup>
                     </Form.Field>
                     <Form.Field inline>
-                      <label>Burn Energy</label>
-                      <Input
-                        placeholder="KW of Energy"
-                        type="number"
-                        onChange={(e) => {
-                          setBurnEnergy(e.target.value);
-                        }}
-                      />
-                      <MyPopup content="Decrement Energy Balance" position="top center">
-                      <Button color="red" onClick={burn}
-                      icon="minus circle"
-                       />
+                      {/* <label>Burn Energy</label> */}
+                      <MyPopup
+                        content={`Enter the no. of Energy Tokens to be created for Prosumer Id ${contractProsumer._prosumerID.toString()}`}
+                        position="top center"
+                      >
+                        <Input
+                          placeholder="KW of Energy"
+                          type="number"
+                          onChange={(e) => {
+                            setBurnEnergy(e.target.value);
+                          }}
+                        />
                       </MyPopup>
-                      
-          
+
+                      <MyPopup
+                        content={`Destroy Energy Tokens for Prosumer Id ${contractProsumer._prosumerID.toString()}`}
+                        position="top center"
+                      >
+                        <Button color="red" onClick={burn}>
+                          Burn Energy
+                        </Button>
+                      </MyPopup>
                     </Form.Field>
                     <Message info>
-                      <p>These are Energy Sync Function that updates energy balance in real-time with energy meter through <br/> IoT Technology</p>
+                      <p>
+                        These are Energy Sync Function that updates energy
+                        balance in real-time with energy meter through <br />{" "}
+                        IoT Technology
+                      </p>
                     </Message>
                   </Form>
                 </Segment>
               ) : (
-                LoaderAnimation() 
+                LoaderAnimation()
               )}
             </Grid.Column>
             <Grid.Column textAlign="center">
               <Segment>
-                <Segment inverted>Listing</Segment>
+                <Segment inverted>
+                  <h3>Listed Energy Details</h3>
+                </Segment>
                 <h3>
-                  Staked Energy:
-                  {contractProsumer._stakedEnergyBalance.toString()}
+                  Listed Energy for Sale:{" "}
+                  {contractProsumer._stakedEnergyBalance.toString()} KW
                 </h3>
+
                 {parseInt(contractProsumer._stakedEnergyBalance.toString()) >
                 0 ? (
                   <>
@@ -578,22 +605,32 @@ const ProsumerDashboard = () => {
                       Price(USD): $
                       {parseInt(
                         contractProsumer._energyUnitPriceUSD.toString()
-                      ) / 1e16}
+                      ) / 1e16}{" "}
+                      /KW
                     </b>
                     <p>
                       Price(Matic):
                       {parseInt(
                         contractProsumer._energyUnitPriceMatic.toString()
                       ) / 1e18}
-                      Matic
+                      Matic /KW
                     </p>
                   </>
                 ) : (
                   <>
-                    <b>Price(USD): $ 0</b>
-                    <p>Price(Matic): 0 Matic</p>
+                    <b>Price(USD): $ 0 /KW</b>
+                    <p>Price(Matic): 0 Matic /KW</p>
                   </>
                 )}
+                <Button
+                  color="teal"
+                  size="big"
+                  onClick={() => {
+                    navigate("/");
+                  }}
+                >
+                  View in Marketplace
+                </Button>
               </Segment>
             </Grid.Column>
             <Grid.Column textAlign="center">
@@ -603,34 +640,42 @@ const ProsumerDashboard = () => {
                     <Header as="h2" color="brown">
                       List Your Energy in Marketplace
                     </Header>
-                    <MyPopup content="Enter the Kilo Watts of Energy to be Listed" position="center">
-                    <Form.Field inline>
-                      <label>Energy Unit </label>
-                      <Input
-                        placeholder="Kilo Watt"
-                        type="number"
-                        onChange={onListChange("stakedEnergy")}
-                        value={stakedEnergy}
-                      />
-                    </Form.Field>
+                    <MyPopup
+                      content="Enter the Kilo Watts of Energy to be Listed"
+                      position="center"
+                    >
+                      <Form.Field inline>
+                        <label>Energy Unit </label>
+                        <Input
+                          placeholder="Kilo Watt"
+                          type="number"
+                          onChange={onListChange("stakedEnergy")}
+                          value={stakedEnergy}
+                        />
+                      </Form.Field>
                     </MyPopup>
-                   <MyPopup content={"Set the price for 1 KW of energy "} position="center">
-                   <Form.Field inline>
-                      <label>Price(USD) </label>
-                      <Input
-                        placeholder="Price for 1 KW"
-                        onChange={onListChange("unitPriceUSD")}
-                        type="number"
-                        value={unitPriceUSD}
-                      />
-                    </Form.Field>
-                   </MyPopup>
-                    <MyPopup content={"List your Energy to Sell"} position="center">
-                    <Button color="blue" onClick={onList}>
-                      List
-                    </Button>
+                    <MyPopup
+                      content={"Set the price for 1 KW of energy "}
+                      position="center"
+                    >
+                      <Form.Field inline>
+                        <label>Price(USD) </label>
+                        <Input
+                          placeholder="Price for 1 KW"
+                          onChange={onListChange("unitPriceUSD")}
+                          type="number"
+                          value={unitPriceUSD}
+                        />
+                      </Form.Field>
                     </MyPopup>
-                    
+                    <MyPopup
+                      content={"List your Energy to Sell"}
+                      position="center"
+                    >
+                      <Button color="blue" onClick={onList}>
+                        List
+                      </Button>
+                    </MyPopup>
                   </Form>
                 </Segment>
               ) : (
@@ -718,7 +763,14 @@ const ProsumerDashboard = () => {
     <>
       {/*------------------- TOGGLE------------------------------------------------------------------- */}
       {/* {component} */}
-      <Base title={toggleState.message === "CONSUMER MODE" ? "PROSUMER DASHBOARD" : "CONSUMER DASHBOARD"} TitleColour="grey" />
+      <Base
+        title={
+          toggleState.message === "CONSUMER MODE"
+            ? "PROSUMER DASHBOARD"
+            : "CONSUMER DASHBOARD"
+        }
+        TitleColour="grey"
+      />
       {queryProsumerID > 0 ? (
         <>
           <Segment compact style={{ display: "inline" }}>

@@ -4,11 +4,16 @@ import NavBar from "./NavBar";
 import { useNavigate } from "react-router-dom";
 import { Button, Divider, Grid, Image, Segment, Icon } from "semantic-ui-react";
 
-const Base = ({ title = "My Title", TitleColour = "black", children }) => {
+const Base = ({
+  title = "My Title",
+  TitleColour = "black",
+  children,
+  style,
+}) => {
   const navigate = useNavigate();
   return (
     <div>
-      <NavBar title={title} TitleColour={TitleColour} />
+      <NavBar title={title} TitleColour={TitleColour} style={style} />
       {children}
       <Segment
         style={{
@@ -25,11 +30,18 @@ const Base = ({ title = "My Title", TitleColour = "black", children }) => {
                   width: "20%",
                 }}
               >
-                <Icon
-                  name="github"
-                  size="large"
-                  style={{ paddingRight: "30px" }}
-                />
+                <a
+                  target="._blank"
+                  href="https://github.com/BasudevBharatBhushan/Peer-to-Peer-Energy-Trading"
+                  style={{ color: "black" }}
+                >
+                  <Icon
+                    name="github"
+                    size="large"
+                    style={{ paddingRight: "30px" }}
+                  />
+                </a>
+
                 <Icon
                   name="youtube"
                   size="large"

@@ -1,0 +1,35 @@
+.slide {
+  border: 8px solid black;
+
+  /* width: 95%; */
+  margin: 2% auto;
+}
+
+.btngroup button {
+  background-color: #bcbec2; /* Green background */
+  border: 1px solid rgb(248, 248, 249); /* Green border */
+  color: white; /* White text */
+  padding: 2px 5px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  /* float: left; */
+  z-index: 1;
+  position: relative;
+  /* right: -350px; */
+  right: -30%;
+}
+
+/* Clear floats (clearfix hack) */
+.btngroup:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.btngroup button:not(:last-child) {
+  border-right: none; /* Prevent double borders */
+}
+
+/* Add a background color on hover */
+.btngroup button:hover {
+  background-color: grey;
+}
