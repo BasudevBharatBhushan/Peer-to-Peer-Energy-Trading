@@ -23,4 +23,20 @@ The proposed model can be broadly divided into two functionalities:
 
 Most P2P energy trading models are based on either the Ethereum Network (simple architecture, high security, but no scalability) or the Hyperledger based framework (complex architecture, scalability and security). By using a side-chain protocol like Polygon Matic with Ethereum, the proposed model simplifies the architecture and improves performance while ensuring scalability.
 
-### Admission
+# Admission of Prosumer through Multi-Sign Verification
+![Marketplace-Flow Chart 1 drawio](https://user-images.githubusercontent.com/64151314/219436247-421daddb-c686-4262-8e24-755759b3f4af.png)
+
+
+
+![image](https://user-images.githubusercontent.com/64151314/219434747-9506db0d-5674-44c1-9cf0-e16691d276bc.png)
+
+# Energy Trading Architecture
+![image](https://user-images.githubusercontent.com/64151314/219434813-d0dceb13-3cb9-4f12-b987-bca7596a43c9.png)
+![image](https://user-images.githubusercontent.com/64151314/219434823-1af309c3-e6d9-4993-8411-54ddd767a9ed.png)
+
+## Project Demo Video
+
+
+
+https://user-images.githubusercontent.com/64151314/219434959-4df69c07-34e7-4094-b285-5f19038dfffb.mp4
+
