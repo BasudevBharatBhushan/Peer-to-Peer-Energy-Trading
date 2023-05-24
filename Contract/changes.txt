@@ -1,0 +1,2 @@
+advert = listEnergy
+bid = buyEnergy
