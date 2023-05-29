@@ -69,7 +69,7 @@ contract EnergyTrade is Energy_Token, PriceConverter, MultiSig {
     function listEnergy(
         uint256 unitEnergyPrice,
         uint256 excessEnergyToken
-    ) public onlyProsumer returns (uint256) {
+    ) public onlyProsumer isNotSuspended returns (uint256) {
         require(
             ApprovedProsumers[prosumerID[msg.sender] - 1]._stakedEnergyBalance == 0,
             "You have Already Staked Energy"
@@ -104,19 +104,22 @@ contract EnergyTrade is Energy_Token, PriceConverter, MultiSig {
     }
 
     //--> 5. Mint Energy Token
-    function produceEnergy(uint256 energyProduced) public onlyProsumer {
+    function produceEnergy(uint256 energyProduced) public onlyProsumer isNotSuspended {
         _mint(msg.sender, energyProduced);
     }
 
     //--> 6. Burn Energy Token
-    function burnEnergy(uint256 energyBurned) public onlyProsumer {
+    function burnEnergy(uint256 energyBurned) public onlyProsumer isNotSuspended {
         _burn(msg.sender, energyBurned);
     }
 
     /*-------------------Consumer--------------------------------------------------------------*/
 
     //--> 1. Buy Energy
-    function buyEnergy(uint256 producerID, uint256 energy_need) public payable onlyProsumer {
+    function buyEnergy(
+        uint256 producerID,
+        uint256 energy_need
+    ) public payable onlyProsumer isNotSuspended {
         uint256 MinPayableAmount = ApprovedProsumers[producerID - 1]._energyUnitPriceMatic *
             energy_need;
         require(msg.value >= MinPayableAmount, "Didn't send enough Matic!");
@@ -153,6 +156,11 @@ contract EnergyTrade is Energy_Token, PriceConverter, MultiSig {
 
     modifier onlyProsumer() {
         require(isProsumer[msg.sender], "Not Prosumer");
+        _;
+    }
+
+    modifier isNotSuspended() {
+        require(!ApprovedProsumers[prosumerID[msg.sender] - 1]._suspended, "You are Suspended");
         _;
     }
 }

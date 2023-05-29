@@ -13,6 +13,8 @@ contract MultiSig {
     mapping(address => bool) public isOwner;
     mapping(address => mapping(address => bool)) public approved; //address1 = unapprovedProsumer address, address2 = address Of Owner, bool
     mapping(address => mapping(address => bool)) public disapproved; //address1 = unapprovedProsumer address, address2 = address Of Owner, bool
+    mapping(address => mapping(address => bool)) public suspended; //address1 = unapprovedProsumer address, address2 = address Of Owner, bool
+    mapping(address => mapping(address => bool)) public unSuspended; //address1 = unapprovedProsumer address, address2 = address Of Owner, bool
 
     /*-------Prosumer Variables-------------------------*/
     struct prosumer {
@@ -20,6 +22,7 @@ contract MultiSig {
         address _address;
         uint256 _aadharId;
         bool _approved;
+        bool _suspended;
         uint256 _energyUnitPriceUSD;
         uint256 _energyUnitPriceMatic;
         uint256 _stakedEnergyBalance;
@@ -32,12 +35,31 @@ contract MultiSig {
     mapping(uint256 => address) public prosumerAddress;
     mapping(address => uint256) public prosumerID;
 
+    //Prosumer Stats
+    mapping(address => uint256) public approvalCount;
+    mapping(address => uint256) public disapprovalCount;
+    mapping(address => uint256) public suspensionCount;
+    mapping(address => uint256) public unSuspensionCount;
+
+    /****************Complain**************************************/
+    struct Complain {
+        uint256 _complainID;
+        uint256 _complainant;
+        uint256 _accused;
+        string _complain;
+        bool _resolved;
+    }
+
+    uint256 public complainCount;
+    uint256 public maxComplains = 10;
+    Complain[] public complains;
+
     /****************Constructor************/
     constructor(address[] memory _owners, uint _required) {
         //We will pass multiple owners & set a particular requirement number of apporvals needed
 
         require(_owners.length > 0, "Owners Required");
-        require(_required > 0 && required <= _owners.length, "Invalid required number of owners");
+        require(_required > 0 && _required <= _owners.length, "Invalid required number of owners");
 
         for (uint i; i < _owners.length; i++) {
             address owner = _owners[i];
@@ -51,6 +73,96 @@ contract MultiSig {
         required = _required;
     }
 
+    // Request for Registration as Prosumer
+
+    /**Unverified User Function***/
+
+    //Internal Function
+    function isRequested() private view returns (bool) {
+        for (uint256 i = 0; i < unApprovedProsumers.length; i++) {
+            if (msg.sender == unApprovedProsumers[i]._address) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //-->1. Register as Prosumer
+    function req_Registration(uint256 _aadharNo) public payable {
+        require(msg.value >= regFee, "Registration Failed, Insufficient Fee");
+        require(!isProsumer[msg.sender], "You are already a Prosumer in the Network");
+        require(!isRequested(), "You have already requested for Registration");
+
+        uint256 digitCheck = _aadharNo;
+        uint256 digits = 0;
+
+        while (digitCheck != 0) {
+            digitCheck /= 10;
+            digits++;
+        }
+
+        require(digits == 12, "Enter a 12 digit Aadhar No.");
+
+        //Create a prosumer object
+        prosumer memory _prosumer = prosumer({
+            _prosumerID: 0,
+            _address: msg.sender,
+            _aadharId: _aadharNo,
+            _approved: false,
+            _suspended: false,
+            _energyUnitPriceUSD: 0,
+            _energyUnitPriceMatic: 0,
+            _stakedEnergyBalance: 0
+        });
+
+        //Push the prosumer object to unApprovedProsumerArray
+        unApprovedProsumers.push(_prosumer);
+    }
+
+    function raiseComplain(uint256 _prosumerId, string memory _complainBody) public {
+        require(isProsumer[msg.sender], "You not a Prosumer");
+        require(isProsumer[prosumerAddress[_prosumerId]], "Accused not a Prosumer");
+        require(
+            !suspended[prosumerAddress[_prosumerId]][msg.sender],
+            "Accused Prosumer is Suspended"
+        );
+        require(!suspended[msg.sender][prosumerAddress[_prosumerId]], "You are Suspended");
+        require(!disapproved[prosumerAddress[_prosumerId]][msg.sender], "Prosumer is Disapproved");
+        require(!disapproved[msg.sender][prosumerAddress[_prosumerId]], "You are Disapproved");
+
+        Complain memory _complain = Complain({
+            _complainID: complains.length + 1,
+            _complainant: prosumerID[msg.sender],
+            _accused: _prosumerId,
+            _complain: _complainBody,
+            _resolved: false
+        });
+
+        if (complains.length < maxComplains) {
+            complains.push(_complain);
+        } else {
+            complains[complainCount % maxComplains] = _complain;
+        }
+
+        if (complainCount < maxComplains) {
+            complainCount++;
+        }
+    }
+
+    function getComplains() public view returns (Complain[] memory) {
+        uint256 length = complains.length;
+        uint256 startIndex = length > maxComplains ? length - maxComplains : 0;
+        uint256 size = length > maxComplains ? maxComplains : length;
+
+        Complain[] memory result = new Complain[](size);
+
+        for (uint256 i = 0; i < size; i++) {
+            result[i] = complains[(startIndex + i) % length];
+        }
+
+        return result;
+    }
+
     /***************Owner Functions***********************/
 
     //--> 1. Set Registration Fee
@@ -61,31 +173,8 @@ contract MultiSig {
 
     //--> 2. Verify Details of Unapproved Prosumer
 
-    //-->2.1 Internal Functions
+    //-->2.1 Internal Function
 
-    //-->2.1.1
-    function _getApprovalCount(uint256 _unApprovedProsumerID) private view returns (uint256 count) {
-        for (uint256 i = 0; i < owners.length; i++) {
-            if (approved[unApprovedProsumers[_unApprovedProsumerID]._address][owners[i]]) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    //-->2.1.2
-    function _getDisApprovalCount(
-        uint256 _unApprovedProsumerID
-    ) private view returns (uint256 count) {
-        for (uint256 i = 0; i < owners.length; i++) {
-            if (disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][owners[i]]) {
-                count += i;
-            }
-        }
-        return count;
-    }
-
-    //-->2.1.3
     function deleteElementFrom_UnApprovedProsumers(
         uint256 _unApprovedProsumerID
     ) private onlyOwner {
@@ -127,6 +216,8 @@ contract MultiSig {
         }
     }
 
+    /*** Admission of Prosumer ***/
+
     //--> 3. Approve Prosumer
 
     function approveProsumer_OwnerSpecific(uint256 _unApprovedProsumerID) public onlyOwner {
@@ -144,11 +235,15 @@ contract MultiSig {
         //If disapproved earlier then wants to approve
         if (disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender]) {
             disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] = false;
+            disapprovalCount[unApprovedProsumers[_unApprovedProsumerID]._address]--;
         }
 
-        //check if approval > unapproval
+        uint256 getApprovalCount = approvalCount[
+            unApprovedProsumers[_unApprovedProsumerID]._address
+        ]++;
 
-        if (_getApprovalCount(_unApprovedProsumerID) >= required) {
+        //check if approval > required
+        if (getApprovalCount > required) {
             //if yes then remove him from unapprove array and add him to approved prosumer array
             unApprovedProsumers[_unApprovedProsumerID]._approved = true; //Set approved Flag = true
             unApprovedProsumers[_unApprovedProsumerID]._prosumerID = ApprovedProsumers.length + 1; //Set Prosumer ID
@@ -181,55 +276,74 @@ contract MultiSig {
         //If approved earlier then disapprove
         if (disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender]) {
             approved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] = false;
+            approvalCount[unApprovedProsumers[_unApprovedProsumerID]._address]--;
         }
 
-        if (_getDisApprovalCount(_unApprovedProsumerID) > required) {
+        uint256 getDisApprovalCount = disapprovalCount[
+            unApprovedProsumers[_unApprovedProsumerID]._address
+        ]++;
+
+        //check if disapproval > required
+        if (getDisApprovalCount > required) {
             //if yes then remove him from unapprove array & don't store in approved array
             deleteElementFrom_UnApprovedProsumers(_unApprovedProsumerID);
+            delete disapprovalCount[unApprovedProsumers[_unApprovedProsumerID]._address];
+            delete approvalCount[unApprovedProsumers[_unApprovedProsumerID]._address];
         }
     }
 
-    //->5. Request for Registration as Prosumer
+    /*** Suspension of Prosumer ***/
 
-    //-->5.1 Internal Function
-    function isRequested() private view returns (bool) {
-        for (uint256 i = 0; i < unApprovedProsumers.length; i++) {
-            if (msg.sender == unApprovedProsumers[i]._address) {
-                return true;
-            }
+    //--> 5. Suspend Prosumer
+    function suspendProsumer(uint256 _prosumerId, uint256 _complainId) public onlyOwner {
+        address getProsumerAddress = prosumerAddress[_prosumerId];
+        require(isProsumer[getProsumerAddress], "Not a Prosumer");
+        require(!suspended[getProsumerAddress][msg.sender], "Already Suspended");
+
+        suspended[getProsumerAddress][msg.sender] = true;
+
+        //If unsuspended earlier then suspend
+        if (unSuspended[getProsumerAddress][msg.sender]) {
+            unSuspended[getProsumerAddress][msg.sender] = false;
+            unSuspensionCount[getProsumerAddress]--;
         }
-        return false;
+
+        uint256 getSuspensionCount = suspensionCount[getProsumerAddress]++;
+
+        //check if suspension > required
+        if (getSuspensionCount > required) {
+            //if yes then remove him from unapprove array & don't store in approved array
+            delete suspensionCount[getProsumerAddress];
+            ApprovedProsumers[_prosumerId - 1]._suspended = true;
+            complains[_complainId - 1]._resolved = true;
+        }
     }
 
-    //-->6.2 Register as Prosumer
-    function req_Registration(uint256 _aadharNo) public payable {
-        require(msg.value >= regFee, "Registration Failed, Insufficient Fee");
-        require(!isProsumer[msg.sender], "You are already a Prosumer in the Network");
-        require(!isRequested(), "You have already requested for Registration");
+    //--> 6. Unsuspend Prosumer
+    function unSuspendProsumer(uint256 _prosumerId, uint256 _complainId) public onlyOwner {
+        require(isProsumer[prosumerAddress[_prosumerId]], "Not a Prosumer");
+        require(!unSuspended[prosumerAddress[_prosumerId]][msg.sender], "Already Unsuspended");
 
-        uint256 digitCheck = _aadharNo;
-        uint256 digits = 0;
+        address prosumerToUnsuspend = prosumerAddress[_prosumerId];
 
-        while (digitCheck != 0) {
-            digitCheck /= 10;
-            digits++;
+        unSuspended[prosumerToUnsuspend][msg.sender] = true;
+
+        // If suspended earlier then unsuspend
+        if (suspended[prosumerToUnsuspend][msg.sender]) {
+            suspended[prosumerToUnsuspend][msg.sender] = false;
+            suspensionCount[prosumerToUnsuspend]--;
         }
 
-        require(digits == 12, "Enter a 12 digit Aadhar No.");
+        uint256 getUnSuspensionCount = unSuspensionCount[prosumerToUnsuspend]++;
 
-        //Create a prosumer object
-        prosumer memory _prosumer = prosumer({
-            _prosumerID: 0,
-            _address: msg.sender,
-            _aadharId: _aadharNo,
-            _approved: false,
-            _energyUnitPriceUSD: 0,
-            _energyUnitPriceMatic: 0,
-            _stakedEnergyBalance: 0
-        });
-
-        //Push the prosumer object to unApprovedProsumerArray
-        unApprovedProsumers.push(_prosumer);
+        // Check if unsuspension > required
+        if (getUnSuspensionCount > required) {
+            // If yes, then remove him from unapprove array & don't store in the approved array
+            delete unSuspensionCount[prosumerToUnsuspend];
+            delete suspensionCount[prosumerToUnsuspend];
+            ApprovedProsumers[_prosumerId - 1]._suspended = false;
+            complains[_complainId - 1]._resolved = true;
+        }
     }
 
     //-->6.3. Witdhraw Funds (Pending , send funds equally to all prosumer)  //Can only be called when Transaction array will be zero.
