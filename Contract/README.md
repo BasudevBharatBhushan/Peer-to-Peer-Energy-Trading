@@ -11,3 +11,5 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.js
 ```
+
+yarn hardhat verify --constructor-args deploy/arguments.js 0x7380da0624A8219F54407A45eC14d44d4dc8fDD4 --network mumbai

@@ -15,10 +15,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     ]
     const minOwnerReq_auth = 2
 
-    const arguments = [owners, minOwnerReq_auth]
+    //GSN Forwarder Address for Polygon Mumbai Testnet
+    const forwarder = "0xB2b5841DBeF766d4b521221732F9B618fCf34A87"
+
+    const arguments = [forwarder, owners, minOwnerReq_auth]
     const EnergyTrade = await deploy("EnergyTrade", {
         from: deployer,
-        args: [owners, minOwnerReq_auth],
+        args: arguments,
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
@@ -26,7 +29,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     //Verify the deployment
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
-        await verify(EnergyTrade.address, { owners, minOwnerReq_auth })
+        await verify(EnergyTrade.address, { forwarder, owners, minOwnerReq_auth })
     }
 }
 

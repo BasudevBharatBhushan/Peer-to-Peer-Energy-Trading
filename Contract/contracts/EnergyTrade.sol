@@ -14,7 +14,11 @@ contract EnergyTrade is Energy_Token, PriceConverter, MultiSig {
 
     /****************Constructor************/
 
-    constructor(address[] memory _owners, uint256 _required) MultiSig(_owners, _required) {
+    constructor(
+        address forwarder,
+        address[] memory _owners,
+        uint256 _required
+    ) MultiSig(forwarder, _owners, _required) {
         escrowAccount = address(this);
     }
 
@@ -34,6 +38,16 @@ contract EnergyTrade is Energy_Token, PriceConverter, MultiSig {
         uint256 unitEnergyPriceMatic,
         uint256 boughtEnergyToken
     );
+
+    //Overriden GSN functions to resolve naming conflicts
+
+    function _msgSender() internal view override(Context, ERC2771Recipient) returns (address) {
+        return ERC2771Recipient._msgSender();
+    }
+
+    function _msgData() internal view override(Context, ERC2771Recipient) returns (bytes calldata) {
+        return ERC2771Recipient._msgData();
+    }
 
     /***************General View Functions***********************/
 

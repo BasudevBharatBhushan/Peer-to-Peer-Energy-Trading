@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 
 pragma solidity ^0.8.7;
+import "@opengsn/contracts/src/ERC2771Recipient.sol";
 
-contract MultiSig {
+//GSN ENABLED CONTRACT
+
+contract MultiSig is ERC2771Recipient {
     /*************Global Variables************/
 
     uint256 public required;
@@ -55,9 +58,11 @@ contract MultiSig {
     Complain[] public complains;
 
     /****************Constructor************/
-    constructor(address[] memory _owners, uint _required) {
-        //We will pass multiple owners & set a particular requirement number of apporvals needed
+    constructor(address forwarder, address[] memory _owners, uint _required) {
+        //Set the trusted forwarder
+        _setTrustedForwarder(forwarder);
 
+        //We will pass multiple owners & set a particular requirement number of apporvals needed
         require(_owners.length > 0, "Owners Required");
         require(_required > 0 && _required <= _owners.length, "Invalid required number of owners");
 
@@ -72,6 +77,8 @@ contract MultiSig {
 
         required = _required;
     }
+
+    string public versionRecipient = "3.0.0";
 
     // Request for Registration as Prosumer
 
@@ -89,6 +96,7 @@ contract MultiSig {
 
     //-->1. Register as Prosumer
     function req_Registration(uint256 _aadharNo) public payable {
+        require(!isOwner[msg.sender], "You are an Owner");
         require(msg.value >= regFee, "Registration Failed, Insufficient Fee");
         require(!isProsumer[msg.sender], "You are already a Prosumer in the Network");
         require(!isRequested(), "You have already requested for Registration");
@@ -120,19 +128,22 @@ contract MultiSig {
     }
 
     function raiseComplain(uint256 _prosumerId, string memory _complainBody) public {
-        require(isProsumer[msg.sender], "You not a Prosumer");
+        require(isProsumer[_msgSender()], "You not a Prosumer");
         require(isProsumer[prosumerAddress[_prosumerId]], "Accused not a Prosumer");
         require(
-            !suspended[prosumerAddress[_prosumerId]][msg.sender],
+            !suspended[prosumerAddress[_prosumerId]][_msgSender()],
             "Accused Prosumer is Suspended"
         );
-        require(!suspended[msg.sender][prosumerAddress[_prosumerId]], "You are Suspended");
-        require(!disapproved[prosumerAddress[_prosumerId]][msg.sender], "Prosumer is Disapproved");
-        require(!disapproved[msg.sender][prosumerAddress[_prosumerId]], "You are Disapproved");
+        require(!suspended[_msgSender()][prosumerAddress[_prosumerId]], "You are Suspended");
+        require(
+            !disapproved[prosumerAddress[_prosumerId]][_msgSender()],
+            "Prosumer is Disapproved"
+        );
+        require(!disapproved[_msgSender()][prosumerAddress[_prosumerId]], "You are Disapproved");
 
         Complain memory _complain = Complain({
             _complainID: complains.length + 1,
-            _complainant: prosumerID[msg.sender],
+            _complainant: prosumerID[_msgSender()],
             _accused: _prosumerId,
             _complain: _complainBody,
             _resolved: false
@@ -147,20 +158,6 @@ contract MultiSig {
         if (complainCount < maxComplains) {
             complainCount++;
         }
-    }
-
-    function getComplains() public view returns (Complain[] memory) {
-        uint256 length = complains.length;
-        uint256 startIndex = length > maxComplains ? length - maxComplains : 0;
-        uint256 size = length > maxComplains ? maxComplains : length;
-
-        Complain[] memory result = new Complain[](size);
-
-        for (uint256 i = 0; i < size; i++) {
-            result[i] = complains[(startIndex + i) % length];
-        }
-
-        return result;
     }
 
     /***************Owner Functions***********************/
@@ -207,9 +204,9 @@ contract MultiSig {
     function showApprovalStatus_OwnerSpecific(
         address _unapprovedProsumerAddress
     ) public view onlyOwner returns (string memory) {
-        if (approved[_unapprovedProsumerAddress][msg.sender]) {
+        if (approved[_unapprovedProsumerAddress][_msgSender()]) {
             return ("Prosumer Approved");
-        } else if (disapproved[_unapprovedProsumerAddress][msg.sender]) {
+        } else if (disapproved[_unapprovedProsumerAddress][_msgSender()]) {
             return ("Prosumer Disapproved");
         } else {
             return ("Prosumer Not Verified Yet");
@@ -226,15 +223,15 @@ contract MultiSig {
             "Invalid Unapproved Prosumer ID"
         );
         require(
-            approved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] == false,
+            approved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()] == false,
             "Prosumer Already approved by you"
         );
 
-        approved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] = true;
+        approved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()] = true;
 
         //If disapproved earlier then wants to approve
-        if (disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender]) {
-            disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] = false;
+        if (disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()]) {
+            disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()] = false;
             disapprovalCount[unApprovedProsumers[_unApprovedProsumerID]._address]--;
         }
 
@@ -267,15 +264,15 @@ contract MultiSig {
             "Invalid Unapproved Prosumer ID"
         );
         require(
-            disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] == false,
+            disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()] == false,
             "Prosumer Already disapproved by you"
         );
 
-        disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] = true;
+        disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()] = true;
 
         //If approved earlier then disapprove
-        if (disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender]) {
-            approved[unApprovedProsumers[_unApprovedProsumerID]._address][msg.sender] = false;
+        if (disapproved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()]) {
+            approved[unApprovedProsumers[_unApprovedProsumerID]._address][_msgSender()] = false;
             approvalCount[unApprovedProsumers[_unApprovedProsumerID]._address]--;
         }
 
@@ -298,13 +295,13 @@ contract MultiSig {
     function suspendProsumer(uint256 _prosumerId, uint256 _complainId) public onlyOwner {
         address getProsumerAddress = prosumerAddress[_prosumerId];
         require(isProsumer[getProsumerAddress], "Not a Prosumer");
-        require(!suspended[getProsumerAddress][msg.sender], "Already Suspended");
+        require(!suspended[getProsumerAddress][_msgSender()], "Already Suspended");
 
-        suspended[getProsumerAddress][msg.sender] = true;
+        suspended[getProsumerAddress][_msgSender()] = true;
 
         //If unsuspended earlier then suspend
-        if (unSuspended[getProsumerAddress][msg.sender]) {
-            unSuspended[getProsumerAddress][msg.sender] = false;
+        if (unSuspended[getProsumerAddress][_msgSender()]) {
+            unSuspended[getProsumerAddress][_msgSender()] = false;
             unSuspensionCount[getProsumerAddress]--;
         }
 
@@ -322,15 +319,15 @@ contract MultiSig {
     //--> 6. Unsuspend Prosumer
     function unSuspendProsumer(uint256 _prosumerId, uint256 _complainId) public onlyOwner {
         require(isProsumer[prosumerAddress[_prosumerId]], "Not a Prosumer");
-        require(!unSuspended[prosumerAddress[_prosumerId]][msg.sender], "Already Unsuspended");
+        require(!unSuspended[prosumerAddress[_prosumerId]][_msgSender()], "Already Unsuspended");
 
         address prosumerToUnsuspend = prosumerAddress[_prosumerId];
 
-        unSuspended[prosumerToUnsuspend][msg.sender] = true;
+        unSuspended[prosumerToUnsuspend][_msgSender()] = true;
 
         // If suspended earlier then unsuspend
-        if (suspended[prosumerToUnsuspend][msg.sender]) {
-            suspended[prosumerToUnsuspend][msg.sender] = false;
+        if (suspended[prosumerToUnsuspend][_msgSender()]) {
+            suspended[prosumerToUnsuspend][_msgSender()] = false;
             suspensionCount[prosumerToUnsuspend]--;
         }
 
@@ -359,7 +356,7 @@ contract MultiSig {
     //6.4. Transfer Ownership
     function transferOwnership(address newOwner) public onlyOwner {
         for (uint256 i = 0; i < owners.length; i++) {
-            if (owners[i] == msg.sender) {
+            if (owners[i] == _msgSender()) {
                 owners[i] = newOwner;
                 break;
             }
@@ -367,7 +364,7 @@ contract MultiSig {
     }
 
     modifier onlyOwner() {
-        require(isOwner[msg.sender], "Not Owner");
+        require(isOwner[_msgSender()], "Not Owner");
         _;
     }
 }
