@@ -48,26 +48,29 @@ const NavBar = ({
               navigate("/escrow/dashboard");
             }}
           />
+        </>
+      )}
+
+      {isAuthenticated() && isAuthenticated().prosumer.role === 0 && (
+        <>
           <Menu.Item
-            name="Pending Transactions"
+            name="Dashboard"
             onClick={() => {
-              navigate("/escrow/pendingtransactions");
+              navigate("/prosumer/dashboard");
             }}
           />
         </>
-      )}
-      {isAuthenticated() && isAuthenticated().prosumer.role === 0 && (
-        <Menu.Item
-          name="Dashboard"
-          onClick={() => {
-            navigate("/prosumer/dashboard");
-          }}
-        />
       )}
       <Menu.Item
         name="View all Trades"
         onClick={() => {
           navigate("/transactions");
+        }}
+      />
+      <Menu.Item
+        name="View Complains"
+        onClick={() => {
+          navigate("/complains");
         }}
       />
       {window.location.pathname !== "/About" && (

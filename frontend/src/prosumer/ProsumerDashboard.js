@@ -274,7 +274,7 @@ const ProsumerDashboard = () => {
       try {
         setListLoading(true);
         const inputPrice = 1e16 * unitPriceUSD;
-        const Advert = await WriteContracts.advert(
+        const Advert = await WriteContracts.listEnergy(
           BigNumber.from(inputPrice),
           BigNumber.from(stakedEnergy)
         );

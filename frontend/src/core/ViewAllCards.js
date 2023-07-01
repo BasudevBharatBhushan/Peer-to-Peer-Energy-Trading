@@ -17,11 +17,10 @@ const ViewAllCards = () => {
         setObj(data);
         console.log("OBJECTS", obj[0]);
       });
-
   }, []);
 
   // const inr_to_usd = ()=>{
-  //   const usdPrice = 
+  //   const usdPrice =
   // }
 
   return (

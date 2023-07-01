@@ -14,6 +14,8 @@ import Card from "./core/Card";
 import ViewAllPendingTxns from "./admin/ViewAllPendingTxns";
 import ViewAllTransactions from "./core/ViewAllTransactions";
 import TransferOwnership from "./admin/TransferOwnership";
+import Complain from "./core/Complain";
+import PendingComplain from "./admin/components/PendingComplain";
 
 /*---Admin Routes & Private Routes----*/
 import AdminRoutes from "./auth/helper/AdminRoutes";
@@ -29,6 +31,7 @@ const Routes = () => {
         <Route path="/about" element={<About />} />
         <Route path="/card" element={<Card />} />
         <Route path="/transactions" element={<ViewAllTransactions />} />
+        <Route path="/complains" element={<Complain />} />
 
         <Route exact path="/prosumer/dashboard" element={<PrivateRoutes />}>
           <Route
@@ -47,16 +50,8 @@ const Routes = () => {
         <Route exact path="/escrow/dashboard" element={<AdminRoutes />}>
           <Route exact path="/escrow/dashboard" element={<EscrowDashboard />} />
         </Route>
-        <Route
-          exact
-          path="/escrow/pendingtransactions"
-          element={<AdminRoutes />}
-        >
-          <Route
-            exact
-            path="/escrow/pendingtransactions"
-            element={<ViewAllPendingTxns />}
-          />
+        <Route exact path="/escrow/complains" element={<AdminRoutes />}>
+          <Route exact path="/escrow/complains" element={<PendingComplain />} />
         </Route>
         <Route exact path="/escrow/transferownership" element={<AdminRoutes />}>
           <Route

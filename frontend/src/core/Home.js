@@ -8,8 +8,6 @@ import logo from "../img/logo.png";
 import { INR_to_USD } from "./helper/priceConverter";
 
 const Home = () => {
-
-
   return (
     <div>
       <Base title="One Step to the Green Future" TitleColour="green" />

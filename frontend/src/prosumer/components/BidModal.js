@@ -15,6 +15,8 @@ import { isAuthenticated } from "../../auth/helper";
 import { updateCard, deleteCard } from "../../core/helper/cardHelper";
 import { useNavigate } from "react-router-dom";
 import MyPopup from "../../util/MyPopup";
+import { createTxn } from "../../core/helper/transactionHelper";
+
 const _ = require("lodash");
 
 const BidModal = ({
@@ -29,6 +31,8 @@ const BidModal = ({
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState(0);
   const [gasPrice, setGasPrice] = useState(0);
+  const [consumerId, setConsumerId] = useState("");
+  const [producerAddress, setProducerAddress] = useState("");
   // const [cardValues, setCardValues] = useState({
   //   stakedEnergy:stakedEnergy
   // })
@@ -43,7 +47,31 @@ const BidModal = ({
     }
   };
 
-  const bid = async () => {
+  const getConsumerId = async () => {
+    if (window.ethereum) {
+      try {
+        const Id = await ReadContracts.prosumerID(prosumer.publicAddress);
+        setConsumerId(Id);
+      } catch (error) {
+        console.log("GetConsumerIDError:", error);
+      }
+    }
+  };
+
+  const getProducerAddress = async () => {
+    if (window.ethereum) {
+      try {
+        const Address = await ReadContracts.prosumerAddress(
+          BigNumber.from(prosumerID)
+        );
+        setProducerAddress(Address);
+      } catch (error) {
+        console.log("GetProducerAddressError:", error);
+      }
+    }
+  };
+
+  const buy = async () => {
     if (
       window.ethereum &&
       window.ethereum.selectedAddress === _.toLower(prosumer.publicAddress)
@@ -56,7 +84,7 @@ const BidModal = ({
         const inputMatic = inputWei.toString();
 
         await WriteContracts.estimateGas
-          .bid(BigNumber.from(prosumerID), BigNumber.from(inputValue), {
+          .buyEnergy(BigNumber.from(prosumerID), BigNumber.from(inputValue), {
             value: ethers.utils.parseEther(inputMatic),
             gasLimit: 500000,
           })
@@ -65,7 +93,7 @@ const BidModal = ({
             setGasPrice(parseInt(data.toString()) << 1);
           });
         console.log(gasPrice);
-        const Bid = await WriteContracts.bid(
+        const Buy = await WriteContracts.buyEnergy(
           BigNumber.from(prosumerID),
           BigNumber.from(inputValue),
           {
@@ -74,13 +102,27 @@ const BidModal = ({
           }
         );
 
-        await Bid.wait(1);
+        await Buy.wait(1);
         setLoading(false);
-        alert(`Bidding Sucessful \n
-        Txn Hash: ${Bid.hash}
+        alert(`Buying Sucessful \n
+        Txn Hash: ${Buy.hash}
         `);
         onSucessfullBid();
-        console.log("ok it is reaching to this point");
+        getConsumerId();
+        getProducerAddress();
+
+        createTxn({
+          txnDate: new Date(),
+          producerID: prosumerID,
+          consumerID: consumerId,
+          producerAddress: producerAddress,
+          consumerAddress: prosumer.publicAddress,
+          tokensTransacted: inputValue,
+          maticsTransacted: inputMatic,
+          unitPriceUSD: unitPriceUSD,
+          unitPriceMatic: unitPriceMatic,
+          transactionHash: Buy.hash,
+        });
       } catch (error) {
         setLoading(false);
         const serializedError = serializeError(error);
@@ -101,16 +143,19 @@ const BidModal = ({
           <Segment inverted>
             <Form inverted>
               <Form.Group widths="equal">
-              <MyPopup content={"Enter the KW of Energy you want to purchase"} position="right center" size="small">
-              <Form.Input
-                  label="Energy Needs"
-                  placeholder="KW of Energy"
-                  onChange={(e) => {
-                    setInputValue(e.target.value);
-                  }}
-                />
-              </MyPopup>
-                
+                <MyPopup
+                  content={"Enter the KW of Energy you want to purchase"}
+                  position="right center"
+                  size="small"
+                >
+                  <Form.Input
+                    label="Energy Needs"
+                    placeholder="KW of Energy"
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                    }}
+                  />
+                </MyPopup>
               </Form.Group>
               <Message floating>
                 <Message.Header>Payable Price:</Message.Header>
@@ -122,11 +167,10 @@ const BidModal = ({
                 </p>
               </Message>
               <MyPopup content={"Place Order"} position="center">
-              <Button type="submit" color="orange" onClick={bid}>
-                Bid
-              </Button>
+                <Button type="submit" color="orange" onClick={buy}>
+                  Buy
+                </Button>
               </MyPopup>
-             
             </Form>
           </Segment>
         </Modal.Description>

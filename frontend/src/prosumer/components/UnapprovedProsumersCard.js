@@ -5,6 +5,8 @@ import { ethers, BigNumber } from "ethers";
 import { serializeError } from "eth-rpc-errors";
 import { isAuthenticated } from "../../auth/helper";
 import { LoaderAnimation } from "../../core/components/LoaderAnimation";
+import { GSN_WriteContracts } from "../../blockchain/gsn";
+
 const _ = require("lodash");
 
 const UnapprovedProsumersCard = ({
@@ -31,7 +33,7 @@ const UnapprovedProsumersCard = ({
       try {
         setLoading(true);
         const ApproveProsumer =
-          await WriteContracts.approveProsumer_OwnerSpecific(
+          await GSN_WriteContracts.approveProsumer_OwnerSpecific(
             BigNumber.from(_index)
           );
         await ApproveProsumer.wait(1);
@@ -60,7 +62,7 @@ const UnapprovedProsumersCard = ({
       try {
         setLoading(true);
         const DisApproveProsumer =
-          await WriteContracts.DisApproveProsumer_OwnerSpecific(
+          await GSN_WriteContracts.DisApproveProsumer_OwnerSpecific(
             BigNumber.from(_index)
           );
         await DisApproveProsumer.wait(1);

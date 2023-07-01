@@ -26,7 +26,6 @@ const PostCard = ({
   const [open, setOpen] = React.useState(false);
   const { prosumer, token } = isAuthenticated();
 
-
   const ModalForm = () => {
     return (
       <Modal
@@ -35,14 +34,18 @@ const PostCard = ({
         onOpen={() => setOpen(true)}
         open={open}
         trigger={
-          <Button color="orange" size="small" disabled={prosumer.name === Prosumer_Name?true:false } >  
+          <Button
+            color="orange"
+            size="small"
+            disabled={prosumer.name === Prosumer_Name ? true : false}
+          >
             Buy Now
           </Button>
-           //TODO: TEch Debt - The username is not made unique
+          //TODO: TEch Debt - The username is not made unique
         }
       >
         <Modal.Header>
-          BID FOR ENERGY |
+          BUY ENERGY |
           <span style={{ color: "brown" }}> Prosumer ID: {"2"}</span>
         </Modal.Header>
         <Modal.Content image>

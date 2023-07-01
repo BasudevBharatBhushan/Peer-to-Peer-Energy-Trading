@@ -235,9 +235,11 @@ contract MultiSig is ERC2771Recipient {
             disapprovalCount[unApprovedProsumers[_unApprovedProsumerID]._address]--;
         }
 
+        approvalCount[unApprovedProsumers[_unApprovedProsumerID]._address]++;
+
         uint256 getApprovalCount = approvalCount[
             unApprovedProsumers[_unApprovedProsumerID]._address
-        ]++;
+        ];
 
         //check if approval > required
         if (getApprovalCount > required) {
@@ -276,9 +278,11 @@ contract MultiSig is ERC2771Recipient {
             approvalCount[unApprovedProsumers[_unApprovedProsumerID]._address]--;
         }
 
+        disapprovalCount[unApprovedProsumers[_unApprovedProsumerID]._address]++;
+
         uint256 getDisApprovalCount = disapprovalCount[
             unApprovedProsumers[_unApprovedProsumerID]._address
-        ]++;
+        ];
 
         //check if disapproval > required
         if (getDisApprovalCount > required) {
