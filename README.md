@@ -1,5 +1,9 @@
 # Peer-to-Peer Energy Trading Model using Blockchain
 Deployed Link (Vercel) - https://peer-to-peer-energy-trading-q1u7.vercel.app/
+
+> **Note:** The GSN-Enabled Source Code & Demo is available in "gsn-enabled" branch
+
+
 ## Tech Stack
 ### Blockchain Layer
 - Solidity (EVM compatible smart contract Language)
